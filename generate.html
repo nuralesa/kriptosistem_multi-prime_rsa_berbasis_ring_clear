@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bangkitkan Kunci - Kriptosistem</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#1173d4",
+        "background-light": "#f6f7f8",
+        "background-dark": "#101922",
+      },
+      fontFamily: {
+        "display": ["Inter", "sans-serif"]
+      },
+    },
+  },
+}
+</script>
+<style>
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+body {
+  min-height: max(884px, 100dvh);
+}
+</style>
+</head>
+
+<body class="font-display">
+<div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
+
+<!-- Header -->
+<header class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm">
+  <div class="flex size-12 shrink-0 items-center justify-start">
+    <!-- Tombol kembali -->
+    <button onclick="window.location.href='menu.html'"
+      class="flex size-10 items-center justify-center rounded-full text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700/50 transition-colors">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+  </div>
+  <h1 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center px-2">
+    Bangkitkan Kunci
+  </h1>
+  <div class="flex size-12 shrink-0 items-center justify-end"></div>
+</header>
+
+<!-- Main -->
+<main class="flex flex-col gap-6 p-4 flex-1">
+
+  <div class="flex flex-col gap-4">
+    <!-- Input bilangan prima -->
+    <div>
+      <label class="text-gray-800 dark:text-gray-100 text-base font-medium mb-2 block" for="prime1">Masukkan Bilangan Prima 1</label>
+      <input id="prime1" type="number" placeholder="Contoh: 17"
+        class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-base"/>
+    </div>
+
+    <div>
+      <label class="text-gray-800 dark:text-gray-100 text-base font-medium mb-2 block" for="prime2">Masukkan Bilangan Prima 2</label>
+      <input id="prime2" type="number" placeholder="Contoh: 19"
+        class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-base"/>
+    </div>
+
+    <div>
+      <label class="text-gray-800 dark:text-gray-100 text-base font-medium mb-2 block" for="prime3">Masukkan Bilangan Prima 3</label>
+      <input id="prime3" type="number" placeholder="Contoh: 23"
+        class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-base"/>
+    </div>
+
+    <!-- Input e -->
+    <div>
+      <label class="text-gray-800 dark:text-gray-100 text-base font-medium mb-2 block" for="e-value">Masukkan Nilai e</label>
+      <input id="e-value" type="number" placeholder="Contoh: 7"
+        class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 text-base"/>
+    </div>
+
+    <!-- Tombol bangkitkan -->
+    <button id="generateKeyBtn" class="flex w-full items-center justify-center gap-2 rounded-xl h-14 px-5 bg-primary text-white font-bold hover:bg-primary/90 transition-colors mt-2">
+      <span class="material-symbols-outlined">key</span>
+      <span>Bangkitkan Kunci</span>
+    </button>
+  </div>
+
+  <div class="border-t border-gray-200 dark:border-gray-700"></div>
+
+  <!-- Hasil -->
+  <div class="flex flex-col gap-4">
+    <h3 class="text-gray-900 dark:text-white text-lg font-bold">Hasil Kunci</h3>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-gray-800 dark:text-gray-100 font-medium" for="public-key">Kunci Publik</label>
+      <textarea id="public-key" readonly
+        class="form-input w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-[120px] p-4 text-gray-600 dark:text-gray-400 text-base">
+Kunci publik akan ditampilkan di sini setelah dibangkitkan.</textarea>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-gray-800 dark:text-gray-100 font-medium" for="private-key">Kunci Privat</label>
+      <textarea id="private-key" readonly
+        class="form-input w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-[120px] p-4 text-gray-600 dark:text-gray-400 text-base">
+Kunci privat akan ditampilkan di sini setelah dibangkitkan.</textarea>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ----------------------------
+// Fungsi bantu (JS versi Pythonmu)
+// ----------------------------
+function gcd(a, b) {
+  while (b !== 0) {
+    const temp = b;
+    b = a % b;
+    a = temp;
+  }
+  return a;
+}
+
+function modinv(a, m) {
+  let t = 0, newT = 1;
+  let r = m, newR = a;
+  while (newR !== 0) {
+    const q = Math.floor(r / newR);
+    [t, newT] = [newT, t - q * newT];
+    [r, newR] = [newR, r - q * newR];
+  }
+  if (r > 1) throw new Error(`Tidak ada invers modular untuk ${a} mod ${m}`);
+  if (t < 0) t += m;
+  return t;
+}
+
+// ----------------------------
+// Proses utama
+// ----------------------------
+document.getElementById("generateKeyBtn").addEventListener("click", () => {
+  const p = parseInt(document.getElementById("prime1").value);
+  const q = parseInt(document.getElementById("prime2").value);
+  const r = parseInt(document.getElementById("prime3").value);
+  const e = parseInt(document.getElementById("e-value").value);
+
+  const pubKeyEl = document.getElementById("public-key");
+  const privKeyEl = document.getElementById("private-key");
+
+  if (!p || !q || !r || !e) {
+    alert("Mohon isi semua nilai bilangan prima dan e.");
+    return;
+  }
+
+  const n = p * q * r;
+  const phi_n = (p - 1) * (q - 1) * (r - 1);
+  const g = gcd(e, phi_n);
+
+  if (g !== 1) {
+    pubKeyEl.value = `❌ Nilai e = ${e} tidak relatif prima terhadap φ(n) = ${phi_n}.
+Karena gcd(e, φ(n)) = ${g}, silakan pilih e lain.`;
+    privKeyEl.value = "";
+    return;
+  }
+
+  try {
+    const d = modinv(e, phi_n);
+    pubKeyEl.value = `Kunci Publik (e, n):
+e = ${e}
+n = ${n}
+φ(n) = ${phi_n}`;
+    privKeyEl.value = `Kunci Privat (d, n):
+d = ${d}
+n = ${n}
+Verifikasi: (e*d) mod φ(n) = ${(e * d) % phi_n}`;
+  } catch (err) {
+    pubKeyEl.value = "Terjadi kesalahan: " + err.message;
+    privKeyEl.value = "";
+  }
+});
+</script>
+
+</body>
+</html>

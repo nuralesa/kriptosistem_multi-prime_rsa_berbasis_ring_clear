@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kriptosistem RSA</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind Config -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#1173d4",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            display: ["Inter", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px",
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+    }
+  </style>
+</head>
+
+<body class="font-display bg-background-light dark:bg-background-dark flex flex-col items-center justify-center text-center">
+  <div class="flex flex-col items-center justify-center px-6">
+
+    <!-- Judul -->
+    <h1 class="text-slate-800 dark:text-white text-[28px] md:text-[32px] font-bold leading-tight mb-6">
+      KRIPTOSISTEM PERMUTASI <em class="italic">MULTI-PRIME</em> RSA<br/>
+      BERBASIS STRUKTUR ALJABAR RING <em class="italic">CLEAR</em>
+    </h1>
+
+    <!-- Gambar -->
+    <div class="w-60 h-60 bg-center bg-no-repeat bg-contain mb-8"
+      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBcJnAKVgdZuKVwLXVtOxbYfGEE7UGe_iIL6mqCkeu7_X7ozA48haI0sz9MH5m7qql_2jhzJU6v-QbJJtKfPscE7_zvTfTGhA0ats427y8pr8aM5771qcdInT70DRcS9dKBA6GLZE31jJUD-1wZDP37WOcU2fPPQJXcp2KLu9iPLda5gnFlkPawfDZHhp0J_mIZm5rfTw0JtY0Cdpqq8fFKdES0sq4H_dj819gXStQxki9iLFpMOHwZiO-nFX9aZrdY0AgcZkTMdyg");'>
+    </div>
+
+    <!-- Tombol Mulai -->
+    <button onclick="window.location.href='menu.html'"
+      class="flex w-full max-w-[300px] items-center justify-center rounded-lg h-12 px-5 bg-primary text-white text-base font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition">
+      Mulai
+    </button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kriptosistem <em class="italic">Multi-Prime</em> RSA Berbasis Struktur Aljabar Ring <em class="italic">Clear</em></title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#1173d4",
+        "background-light": "#f6f7f8",
+        "background-dark": "#101922",
+      },
+      fontFamily: {
+        "display": ["Inter", "sans-serif"]
+      },
+      borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+    },
+  },
+}
+</script>
+<style>
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+body { min-height: max(884px, 100dvh); }
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-auto min-h-screen w-full flex-col">
+
+<!-- Top App Bar -->
+<header class="flex h-16 shrink-0 items-center justify-between bg-background-light dark:bg-background-dark px-4 pt-4">
+  <div class="flex size-12 shrink-0 items-center justify-start"></div>
+  <h1 class="flex-1 text-center text-lg font-bold tracking-tight text-[#18181B] dark:text-white">
+    Kriptosistem <em class="italic">Multi-Prime</em> RSA Berbasis Struktur Aljabar Ring <em class="italic">Clear</em>
+  </h1>
+  <div class="flex w-12 items-center justify-end">
+    <button class="flex h-12 w-12 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-transparent text-[#4A4A4A] dark:text-gray-300 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
+      <span class="material-symbols-outlined text-2xl">info</span>
+    </button>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="flex flex-1 flex-col gap-4 p-4">
+
+  <!-- Generate Key -->
+  <div onclick="window.location.href='generate.html'" 
+    class="flex cursor-pointer flex-col gap-4 rounded-xl bg-white dark:bg-[#1a2632] p-4 transition-transform active:scale-[0.98] hover:bg-blue-50 dark:hover:bg-[#243447]">
+    <div class="flex items-center gap-4">
+      <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/20 text-primary">
+        <span class="material-symbols-outlined text-2xl">key</span>
+      </div>
+      <div class="flex flex-1 flex-col justify-center">
+        <p class="text-base font-medium text-gray-900 dark:text-white">Bangkitkan Kunci</p>
+        <p class="text-sm font-normal text-gray-600 dark:text-[#9dabb9]">Buat pasangan kunci publik & privat baru.</p>
+      </div>
+      <div class="shrink-0">
+        <span class="material-symbols-outlined text-gray-400 dark:text-gray-500">chevron_right</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Encrypt Text -->
+  <div onclick="window.location.href='encrypt.html'" 
+    class="flex cursor-pointer flex-col gap-4 rounded-xl bg-white dark:bg-[#1a2632] p-4 transition-transform active:scale-[0.98] hover:bg-blue-50 dark:hover:bg-[#243447]">
+    <div class="flex items-center gap-4">
+      <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/20 text-primary">
+        <span class="material-symbols-outlined text-2xl">lock</span>
+      </div>
+      <div class="flex flex-1 flex-col justify-center">
+        <p class="text-base font-medium text-gray-900 dark:text-white">Enkripsi Teks</p>
+        <p class="text-sm font-normal text-gray-600 dark:text-[#9dabb9]">Amankan pesan teks dengan kunci publik.</p>
+      </div>
+      <div class="shrink-0">
+        <span class="material-symbols-outlined text-gray-400 dark:text-gray-500">chevron_right</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decrypt Text -->
+  <div onclick="window.location.href='decrypt.html'" 
+    class="flex cursor-pointer flex-col gap-4 rounded-xl bg-white dark:bg-[#1a2632] p-4 transition-transform active:scale-[0.98] hover:bg-blue-50 dark:hover:bg-[#243447]">
+    <div class="flex items-center gap-4">
+      <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/20 text-primary">
+        <span class="material-symbols-outlined text-2xl">lock_open</span>
+      </div>
+      <div class="flex flex-1 flex-col justify-center">
+        <p class="text-base font-medium text-gray-900 dark:text-white">Dekripsi Teks</p>
+        <p class="text-sm font-normal text-gray-600 dark:text-[#9dabb9]">Buka pesan terenkripsi dengan kunci privat.</p>
+      </div>
+      <div class="shrink-0">
+        <span class="material-symbols-outlined text-gray-400 dark:text-gray-500">chevron_right</span>
+      </div>
+    </div>
+  </div>
+
+<!-- Tombol Kembali -->
+<div class="flex justify-center mt-6">
+  <button onclick="window.location.href='index.html'" 
+    class="flex items-center gap-2 px-5 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition">
+    <span class="material-symbols-outlined">arrow_back</span>
+    Kembali ke Awal
+  </button>
+</div>
+
+</main>
+</div>
+</body>
+</html>

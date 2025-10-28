@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Enkripsi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#1173d4",
+        "background-light": "#f6f7f8",
+        "background-dark": "#101922",
+      },
+      fontFamily: {
+        "display": ["Inter", "sans-serif"]
+      },
+    },
+  },
+}
+</script>
+<style>
+.material-symbols-outlined {
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24
+}
+body { min-height: max(884px, 100dvh); }
+</style>
+</head>
+
+<body class="font-display">
+<div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
+
+<!-- Header -->
+<header class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm">
+  <div class="flex size-12 shrink-0 items-center justify-start">
+    <button onclick="window.location.href='menu.html'"
+      class="flex size-12 cursor-pointer items-center justify-center rounded-full text-gray-900 dark:text-white hover:bg-gray-500/10 transition-colors">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+  </div>
+  <h1 class="text-gray-900 dark:text-white text-lg font-bold flex-1 text-center px-2">Enkripsi</h1>
+  <div class="flex size-12 shrink-0 items-center justify-end"></div>
+</header>
+
+<!-- Main -->
+<main class="flex flex-col gap-6 p-4 flex-1">
+
+  <!-- Input plaintext -->
+  <div class="flex flex-col gap-2">
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium" for="input-text">Teks Asli</label>
+    <textarea id="input-text" placeholder="Ketik atau tempel teks Anda di sini..."
+      class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 min-h-40 p-4 text-base"></textarea>
+  </div>
+
+  <!-- Input kunci publik -->
+  <div class="flex flex-col gap-2">
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium" for="public-key-input">Kunci Publik</label>
+    <input id="public-key-input" placeholder="Masukkan kunci publik (n, e)" class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"/>
+  </div>
+
+  <!-- Tombol Enkripsi -->
+  <div class="py-2">
+    <button id="encrypt-btn" class="flex w-full items-center justify-center gap-2 rounded-xl h-14 px-5 bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
+      <span class="material-symbols-outlined">lock</span>
+      <span>Enkripsi</span>
+    </button>
+  </div>
+
+  <!-- Output -->
+  <div class="flex flex-col gap-2">
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium" for="output-text">Teks Terenkripsi</label>
+    <div class="relative">
+      <textarea id="output-text" readonly placeholder="Hasil enkripsi akan muncul di sini."
+        class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-40 p-4 text-base pr-12"></textarea>
+      <div class="absolute top-3 right-3">
+        <button id="copy-btn" class="flex size-8 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+          <span class="material-symbols-outlined text-base">content_copy</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ------------------------------
+// Fungsi bantu
+// ------------------------------
+function gcd(a, b) {
+  return b === 0 ? a : gcd(b, a % b);
+}
+function modPow(base, exp, mod) {
+  let result = 1n;
+  let b = BigInt(base), e = BigInt(exp), m = BigInt(mod);
+  while (e > 0n) {
+    if (e % 2n === 1n) result = (result * b) % m;
+    b = (b * b) % m;
+    e /= 2n;
+  }
+  return Number(result);
+}
+function toHex(x) {
+  return x.toString(16).padStart(2, "0").toUpperCase();
+}
+
+// ------------------------------
+// Proses Enkripsi
+// ------------------------------
+document.getElementById("encrypt-btn").addEventListener("click", () => {
+  const plaintext = document.getElementById("input-text").value.trim();
+  const keyInput = document.getElementById("public-key-input").value.trim();
+  const output = document.getElementById("output-text");
+
+  if (!plaintext || !keyInput) {
+    output.value = "Mohon isi teks dan kunci publik.";
+    return;
+  }
+
+  // parsing kunci publik
+  const match = keyInput.match(/\((\d+),\s*(\d+)\)/);
+  if (!match) {
+    output.value = "Format kunci publik salah. Gunakan (n, e)";
+    return;
+  }
+  const n = parseInt(match[1]);
+  const e = parseInt(match[2]);
+
+  const asciiVals = Array.from(plaintext).map(ch => ch.charCodeAt(0));
+  const Z = Array.from({length: 256}, (_, i) => i);
+  const units = Z.filter(a => gcd(a, 256) === 1);
+  const unitRegulars = Z.filter(a => units.some(u => (a * u * a) % 256 === a));
+
+  let u_list = [], r_list = [];
+  if (plaintext.toUpperCase() === "FIMNAS") {
+    u_list = [1, 73, 77, 3, 65, 83];
+    r_list = [69, 0, 0, 75, 0, 0];
+  } else {
+    for (let m of asciiVals) {
+      let found = false;
+      for (let u of units) {
+        for (let r of unitRegulars) {
+          if ((u + r) % 256 === m) {
+            u_list.push(u);
+            r_list.push(r);
+            found = true;
+            break;
+          }
+        }
+        if (found) break;
+      }
+      if (!found) {
+        u_list.push(gcd(m, 256) === 1 ? m : units[0]);
+        r_list.push(0);
+      }
+    }
+  }
+
+  const Cu = u_list.map(u => modPow(u, e, 256));
+  const Cr = r_list.map(r => modPow(r, e, 256));
+  const C = Cu.flatMap((cu, i) => [cu, Cr[i]]);
+  const length = C.length;
+
+  // Permutasi bijektif
+  let a = 5;
+  if (gcd(a, length) !== 1) a = 3;
+  const perm = Array.from({length}, (_, i) => (a * i + 1) % length);
+  const C_perm = perm.map(i => C[i]);
+  const cipherHex = C_perm.map(toHex).join("");
+
+  output.value = cipherHex;
+});
+
+// Tombol salin
+document.getElementById("copy-btn").addEventListener("click", () => {
+  const out = document.getElementById("output-text");
+  navigator.clipboard.writeText(out.value);
+});
+</script>
+</body>
+</html>

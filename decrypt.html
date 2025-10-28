@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kriptosistem - Dekripsi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#1173d4",
+        "background-light": "#f6f7f8",
+        "background-dark": "#101922",
+      },
+      fontFamily: {
+        "display": ["Inter", "sans-serif"]
+      },
+    },
+  },
+}
+</script>
+
+<style>
+.material-symbols-outlined {
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24
+}
+body { min-height: max(884px, 100dvh); }
+</style>
+</head>
+
+<body class="font-display">
+<div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
+
+<!-- Header -->
+<header class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm">
+  <div class="flex size-12 shrink-0 items-center justify-start">
+    <button onclick="window.location.href='menu.html'"
+      class="flex size-12 cursor-pointer items-center justify-center rounded-full text-gray-900 dark:text-white hover:bg-gray-500/10 transition-colors">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+  </div>
+  <h1 class="text-gray-900 dark:text-white text-lg font-bold flex-1 text-center">Dekripsi</h1>
+  <div class="flex size-12 shrink-0 items-center justify-end"></div>
+</header>
+
+<!-- Main -->
+<main class="flex flex-col gap-4 p-4 flex-1">
+  <div class="flex flex-col gap-2">
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium" for="encrypted-text">Teks Terenkripsi</label>
+    <textarea id="encrypted-text" placeholder="Ketik atau tempel teks terenkripsi di sini..."
+      class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 min-h-40 p-4 text-base"></textarea>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium" for="private-key">Kunci Pribadi (n, d)</label>
+    <input id="private-key" placeholder="Masukkan kunci pribadi, format (n, d)"
+      class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"/>
+  </div>
+
+  <div class="py-2">
+    <button id="decrypt-btn"
+      class="flex w-full items-center justify-center gap-2 rounded-xl h-14 px-5 bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
+      <span class="material-symbols-outlined">lock_open</span>
+      <span>Dekripsi</span>
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium" for="original-text">Teks Asli</label>
+    <div class="relative">
+      <textarea id="original-text" readonly placeholder="Hasil dekripsi akan muncul di sini."
+        class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-40 p-4 text-base pr-12"></textarea>
+      <div class="absolute top-3 right-3">
+        <button id="copy-btn"
+          class="flex size-8 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+          <span class="material-symbols-outlined text-base">content_copy</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<script>
+// ------------------------------------
+// FUNGSI BANTU
+// ------------------------------------
+function gcd(a, b) {
+  return b === 0 ? a : gcd(b, a % b);
+}
+function modPow(base, exp, mod) {
+  let result = 1n;
+  let b = BigInt(base), e = BigInt(exp), m = BigInt(mod);
+  while (e > 0n) {
+    if (e % 2n === 1n) result = (result * b) % m;
+    b = (b * b) % m;
+    e /= 2n;
+  }
+  return Number(result);
+}
+function fromHexPair(pair) {
+  return parseInt(pair, 16);
+}
+
+// ------------------------------------
+// FUNGSI DEKRIPSI
+// ------------------------------------
+document.getElementById("decrypt-btn").addEventListener("click", () => {
+  const cipherHex = document.getElementById("encrypted-text").value.trim();
+  const keyInput = document.getElementById("private-key").value.trim();
+  const output = document.getElementById("original-text");
+
+  if (!cipherHex || !keyInput) {
+    output.value = "Mohon isi ciphertext dan kunci pribadi.";
+    return;
+  }
+
+  const match = keyInput.match(/\((\d+),\s*(\d+)\)/);
+  if (!match) {
+    output.value = "Format kunci pribadi salah. Gunakan (n, d)";
+    return;
+  }
+  const n = parseInt(match[1]);
+  const d = parseInt(match[2]);
+
+  if (cipherHex.length % 2 !== 0) {
+    output.value = "Ciphertext tidak valid: panjang hex harus genap.";
+    return;
+  }
+
+  // ubah ke array byte
+  const C_perm = [];
+  for (let i = 0; i < cipherHex.length; i += 2)
+    C_perm.push(fromHexPair(cipherHex.slice(i, i + 2)));
+
+  const length = C_perm.length;
+  let a = 5;
+  if (gcd(a, length) !== 1) a = 3;
+  const perm = Array.from({length}, (_, i) => (a * i + 1) % length);
+  const inverse_perm = Array(length).fill(0);
+  for (let i = 0; i < length; i++) inverse_perm[perm[i]] = i;
+
+  const C = inverse_perm.map(i => C_perm[i]);
+
+  if (length % 2 !== 0) {
+    output.value = "Ciphertext tidak valid: jumlah byte ganjil.";
+    return;
+  }
+
+  const Cu = C.filter((_, i) => i % 2 === 0);
+  const Cr = C.filter((_, i) => i % 2 === 1);
+
+  const U_dec = Cu.map(cu => modPow(cu, d, 256));
+  const R_dec = Cr.map(cr => modPow(cr, d, 256));
+
+  const asciiVals = U_dec.map((u, i) => (u + R_dec[i]) % 256);
+  const plaintext = asciiVals.map(a => String.fromCharCode(a)).join('');
+
+  output.value = plaintext;
+});
+
+// tombol salin
+document.getElementById("copy-btn").addEventListener("click", () => {
+  const out = document.getElementById("original-text");
+  navigator.clipboard.writeText(out.value);
+});
+</script>
+</body>
+</html>
