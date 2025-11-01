@@ -104,12 +104,15 @@ function modPow(base, exp, mod) {
   }
   return Number(result);
 }
-function fromHexPair(pair) {
-  return parseInt(pair, 16);
+function fromHexString(hexStr) {
+  const res = [];
+  for (let i = 0; i < hexStr.length; i += 2)
+    res.push(parseInt(hexStr.slice(i, i + 2), 16));
+  return res;
 }
 
 // ------------------------------------
-// FUNGSI DEKRIPSI
+// PROSES DEKRIPSI
 // ------------------------------------
 document.getElementById("decrypt-btn").addEventListener("click", () => {
   const cipherHex = document.getElementById("encrypted-text").value.trim();
@@ -126,46 +129,41 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
     output.value = "Format kunci pribadi salah. Gunakan (n, d)";
     return;
   }
+
   const n = parseInt(match[1]);
   const d = parseInt(match[2]);
-
-  if (cipherHex.length % 2 !== 0) {
-    output.value = "Ciphertext tidak valid: panjang hex harus genap.";
-    return;
-  }
-
-  // ubah ke array byte
-  const C_perm = [];
-  for (let i = 0; i < cipherHex.length; i += 2)
-    C_perm.push(fromHexPair(cipherHex.slice(i, i + 2)));
-
+  const C_perm = fromHexString(cipherHex);
   const length = C_perm.length;
-  let a = 5;
-  if (gcd(a, length) !== 1) a = 3;
-  const perm = Array.from({length}, (_, i) => (a * i + 1) % length);
-  const inverse_perm = Array(length).fill(0);
-  for (let i = 0; i < length; i++) inverse_perm[perm[i]] = i;
-
-  const C = inverse_perm.map(i => C_perm[i]);
 
   if (length % 2 !== 0) {
     output.value = "Ciphertext tidak valid: jumlah byte ganjil.";
     return;
   }
 
+  // Balikkan permutasi
+  let a = 5;
+  if (gcd(a, length) !== 1) a = 3;
+  const perm = Array.from({length}, (_, i) => ((a * (i)) + 1) % length);
+  const inverse_perm = Array(length).fill(0);
+  for (let i = 0; i < length; i++) inverse_perm[perm[i]] = i;
+  const C = inverse_perm.map(i => C_perm[i]);
+
+  // Pisahkan Cu dan Cr
   const Cu = C.filter((_, i) => i % 2 === 0);
   const Cr = C.filter((_, i) => i % 2 === 1);
 
-  const U_dec = Cu.map(cu => modPow(cu, d, 256));
-  const R_dec = Cr.map(cr => modPow(cr, d, 256));
+  // Dekripsi di Z_256
+  const Du = Cu.map(cu => modPow(cu, d, 256));
+  const Dr = Cr.map(cr => modPow(cr, d, 256));
 
-  const asciiVals = U_dec.map((u, i) => (u + R_dec[i]) % 256);
-  const plaintext = asciiVals.map(a => String.fromCharCode(a)).join('');
+  // Rekonstruksi plaintext
+  const M = Du.map((du, i) => (du + Dr[i]) % 256);
+  const plaintext = M.map(m => String.fromCharCode(m)).join('');
 
-  output.value = plaintext;
+  output.value = plaintext || "(Dekripsi gagal atau hasil kosong)";
 });
 
-// tombol salin
+// Tombol salin
 document.getElementById("copy-btn").addEventListener("click", () => {
   const out = document.getElementById("original-text");
   navigator.clipboard.writeText(out.value);
