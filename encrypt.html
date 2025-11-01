@@ -89,29 +89,22 @@ body { min-height: max(884px, 100dvh); }
 </div>
 
 <script>
-// ------------------------------
+// ----------------------------------
 // Fungsi bantu
-// ------------------------------
+// ----------------------------------
 function gcd(a, b) {
   return b === 0 ? a : gcd(b, a % b);
 }
-function modPow(base, exp, mod) {
-  let result = 1n;
-  let b = BigInt(base), e = BigInt(exp), m = BigInt(mod);
-  while (e > 0n) {
-    if (e % 2n === 1n) result = (result * b) % m;
-    b = (b * b) % m;
-    e /= 2n;
-  }
-  return Number(result);
+function pow256(x, exp) {
+  return Number(BigInt(x) ** BigInt(exp) % 256n);
 }
 function toHex(x) {
   return x.toString(16).padStart(2, "0").toUpperCase();
 }
 
-// ------------------------------
-// Proses Enkripsi
-// ------------------------------
+// ----------------------------------
+// Enkripsi
+// ----------------------------------
 document.getElementById("encrypt-btn").addEventListener("click", () => {
   const plaintext = document.getElementById("input-text").value.trim();
   const keyInput = document.getElementById("public-key-input").value.trim();
@@ -122,58 +115,81 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
     return;
   }
 
-  // parsing kunci publik
+  // parsing (n, e)
   const match = keyInput.match(/\((\d+),\s*(\d+)\)/);
   if (!match) {
     output.value = "Format kunci publik salah. Gunakan (n, e)";
     return;
   }
-  const n = parseInt(match[1]);
   const e = parseInt(match[2]);
 
   const asciiVals = Array.from(plaintext).map(ch => ch.charCodeAt(0));
+  if (asciiVals.some(x => x < 0 || x > 255)) {
+    output.value = "❌ Karakter tidak bisa diproses (di luar 0–255)";
+    return;
+  }
+  if (asciiVals.length === 0) {
+    output.value = "❌ Plaintext kosong.";
+    return;
+  }
+
+  // ----------------------------------
+  // Unit & unit reguler di Z_256
+  // ----------------------------------
   const Z = Array.from({length: 256}, (_, i) => i);
   const units = Z.filter(a => gcd(a, 256) === 1);
-  const unitRegulars = Z.filter(a => units.some(u => (a * u * a) % 256 === a));
 
+  function isUnitRegular(a) {
+    return units.some(u => (a * u * a) % 256 === a);
+  }
+  const unitRegulars = Z.filter(isUnitRegular);
+
+  // ----------------------------------
+  // Pasangan (u_i, r_i)
+  // ----------------------------------
   let u_list = [], r_list = [];
-  if (plaintext.toUpperCase() === "FIMNAS") {
-    u_list = [1, 73, 77, 3, 65, 83];
-    r_list = [69, 0, 0, 75, 0, 0];
-  } else {
-    for (let m of asciiVals) {
-      let found = false;
-      for (let u of units) {
-        for (let r of unitRegulars) {
-          if ((u + r) % 256 === m) {
-            u_list.push(u);
-            r_list.push(r);
-            found = true;
-            break;
-          }
+  for (let m of asciiVals) {
+    let found = false;
+    for (let u of units) {
+      for (let r of unitRegulars) {
+        if ((u + r) % 256 === m) {
+          u_list.push(u);
+          r_list.push(r);
+          found = true;
+          break;
         }
-        if (found) break;
       }
-      if (!found) {
-        u_list.push(gcd(m, 256) === 1 ? m : units[0]);
-        r_list.push(0);
-      }
+      if (found) break;
+    }
+    if (!found) {
+      u_list.push((m + 1) % 256);
+      r_list.push((m - 1 + 256) % 256);
     }
   }
 
-  const Cu = u_list.map(u => modPow(u, e, 256));
-  const Cr = r_list.map(r => modPow(r, e, 256));
-  const C = Cu.flatMap((cu, i) => [cu, Cr[i]]);
-  const length = C.length;
+  // ----------------------------------
+  // Enkripsi di Z_256
+  // ----------------------------------
+  const Cu = u_list.map(u => pow256(u, e));
+  const Cr = r_list.map(r => pow256(r, e));
+  const C = [];
+  for (let i = 0; i < Cu.length; i++) {
+    C.push(Cu[i], Cr[i]);
+  }
 
-  // Permutasi bijektif
+  const cipherHexBefore = C.map(toHex).join("");
+
+  // ----------------------------------
+  // Permutasi bijektif sederhana
+  // ----------------------------------
   let a = 5;
+  const length = C.length;
   if (gcd(a, length) !== 1) a = 3;
-  const perm = Array.from({length}, (_, i) => (a * i + 1) % length);
+  const perm = Array.from({length}, (_, i) => ((a * (i + 1 - 1) + 1) % length));
   const C_perm = perm.map(i => C[i]);
-  const cipherHex = C_perm.map(toHex).join("");
+  const cipherHexAfter = C_perm.map(toHex).join("");
 
-  output.value = cipherHex;
+  output.value = cipherHexAfter;
 });
 
 // Tombol salin
