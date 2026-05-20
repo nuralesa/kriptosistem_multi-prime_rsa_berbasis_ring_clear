@@ -151,28 +151,44 @@ body {
 // --------------------------------------------------
 
 function gcd(a, b) {
-  return b === 0 ? a : gcd(b, a % b);
+
+  return b === 0
+    ? a
+    : gcd(b, a % b);
+
 }
 
 function modPow(base, exp, mod) {
 
   let result = 1n;
 
-  let b = BigInt(base);
-  let e = BigInt(exp);
-  let m = BigInt(mod);
+  let b =
+    BigInt(base);
+
+  let e =
+    BigInt(exp);
+
+  let m =
+    BigInt(mod);
 
   while (e > 0n) {
 
     if (e % 2n === 1n) {
-      result = (result * b) % m;
+
+      result =
+        (result * b) % m;
+
     }
 
-    b = (b * b) % m;
+    b =
+      (b * b) % m;
+
     e /= 2n;
+
   }
 
   return Number(result);
+
 }
 
 function fromHexString(hexStr) {
@@ -185,19 +201,51 @@ function fromHexString(hexStr) {
 }
 
 // --------------------------------------------------
+// MODULAR INVERSE
+// --------------------------------------------------
+
+function modInverse(a, m) {
+
+  a =
+    ((a % m) + m) % m;
+
+  for (let x = 1; x < m; x++) {
+
+    if ((a * x) % m === 1) {
+
+      return x;
+
+    }
+
+  }
+
+  return 1;
+
+}
+
+// --------------------------------------------------
 // DEKRIPSI
 // --------------------------------------------------
 
-document.getElementById("decrypt-btn").addEventListener("click", () => {
+document
+  .getElementById("decrypt-btn")
+  .addEventListener("click", () => {
 
   const cipherHex =
-    document.getElementById("ciphertext").value.trim();
+    document
+      .getElementById("ciphertext")
+      .value
+      .trim();
 
   const keyInput =
-    document.getElementById("private-key").value.trim();
+    document
+      .getElementById("private-key")
+      .value
+      .trim();
 
   const output =
-    document.getElementById("plaintext");
+    document
+      .getElementById("plaintext");
 
   // VALIDASI
 
@@ -207,9 +255,12 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
       "Mohon isi ciphertext dan private key.";
 
     return;
+
   }
 
+  // --------------------------------------------------
   // PARSING PRIVATE KEY
+  // --------------------------------------------------
 
   const match =
     keyInput.match(/\((\d+),\s*(\d+)\)/);
@@ -220,6 +271,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
       "Format private key salah.";
 
     return;
+
   }
 
   const n =
@@ -228,7 +280,9 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const d =
     parseInt(match[2]);
 
+  // --------------------------------------------------
   // HEX -> INTEGER
+  // --------------------------------------------------
 
   const C_perm =
     fromHexString(cipherHex);
@@ -242,48 +296,74 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
       "Ciphertext tidak valid.";
 
     return;
+
   }
 
+  // --------------------------------------------------
   // INVERSE PERMUTATION
+  // --------------------------------------------------
 
   let a = 5;
 
-  if (gcd(a, length) !== 1) {
-    a = 3;
-  }
+  while (
+    gcd(a, length) !== 1
+  ) {
 
-  const perm =
-    Array.from({length}, (_, i) => (a * i) % length);
-
-  const inverse_perm =
-    Array(length).fill(0);
-
-  for (let i = 0; i < length; i++) {
-
-    inverse_perm[perm[i]] = i;
+    a++;
 
   }
+
+  // inverse dari a modulo length
+
+  const a_inv =
+    modInverse(a, length);
 
   const C =
-    inverse_perm.map(i => C_perm[i]);
+    new Array(length);
 
+  for (let j = 0; j < length; j++) {
+
+    const i =
+      (a_inv * j) % length;
+
+    C[i] =
+      C_perm[j];
+
+  }
+
+  // --------------------------------------------------
   // PISAHKAN Cu DAN Cr
+  // --------------------------------------------------
 
-  const Cu =
-    C.filter((_, i) => i % 2 === 0);
+  const Cu = [];
+  const Cr = [];
 
-  const Cr =
-    C.filter((_, i) => i % 2 === 1);
+  for (let i = 0; i < C.length; i += 2) {
 
+    Cu.push(C[i]);
+
+    Cr.push(C[i + 1]);
+
+  }
+
+  // --------------------------------------------------
   // RSA DECRYPTION
+  // --------------------------------------------------
 
   const Du =
-    Cu.map(cu => modPow(cu, d, n));
+    Cu.map(
+      cu => modPow(cu, d, n)
+    );
 
   const Dr =
-    Cr.map(cr => modPow(cr, d, n));
+    Cr.map(
+      cr => modPow(cr, d, n)
+    );
 
-  // REKONSTRUKSI PLAINTEXT
+  // --------------------------------------------------
+  // REKONSTRUKSI
+  // mi = ui + ri mod 256
+  // --------------------------------------------------
 
   const M = [];
 
@@ -296,13 +376,21 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
 
   }
 
-  const plaintext =
-    M.map(m => String.fromCharCode(m)).join("");
+  // --------------------------------------------------
+  // ASCII
+  // --------------------------------------------------
 
-  output.value = plaintext;
+  const plaintext =
+    M.map(
+      m => String.fromCharCode(m)
+    ).join("");
+
+  output.value =
+    plaintext;
 
 });
 
 </script>
+
 </body>
 </html>
