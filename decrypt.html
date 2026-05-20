@@ -45,8 +45,6 @@ body {
 
 <div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
 
-<!-- HEADER -->
-
 <header class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm">
 
   <div class="flex size-12 shrink-0 items-center justify-start">
@@ -71,11 +69,9 @@ body {
 
 </header>
 
-<!-- MAIN -->
-
 <main class="flex flex-col gap-6 p-4 flex-1">
 
-  <!-- INPUT CIPHERTEXT -->
+  <!-- CIPHERTEXT -->
 
   <div class="flex flex-col gap-2">
 
@@ -111,7 +107,7 @@ body {
 
     <button
       id="decrypt-btn"
-      class="flex w-full items-center justify-center gap-2 rounded-xl h-14 px-5 bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
+      class="flex w-full items-center justify-center gap-2 rounded-xl h-14 px-5 bg-green-600 text-white font-bold hover:bg-green-700 transition-colors">
 
       <span class="material-symbols-outlined">
         lock_open
@@ -125,7 +121,7 @@ body {
 
   </div>
 
-  <!-- OUTPUT -->
+  <!-- PLAINTEXT -->
 
   <div class="flex flex-col gap-2">
 
@@ -133,29 +129,11 @@ body {
       Plaintext
     </label>
 
-    <div class="relative">
-
-      <textarea
-        id="plaintext"
-        readonly
-        placeholder="Hasil dekripsi..."
-        class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-40 p-4 text-base pr-12"></textarea>
-
-      <div class="absolute top-3 right-3">
-
-        <button
-          id="copy-btn"
-          class="flex size-8 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-
-          <span class="material-symbols-outlined text-base">
-            content_copy
-          </span>
-
-        </button>
-
-      </div>
-
-    </div>
+    <textarea
+      id="plaintext"
+      readonly
+      placeholder="Hasil dekripsi..."
+      class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-40 p-4 text-base"></textarea>
 
   </div>
 
@@ -195,16 +173,11 @@ function modPow(base, exp, mod) {
 
 function fromHexString(hexStr) {
 
-  const res = [];
+  return hexStr
+    .trim()
+    .split(/\s+/)
+    .map(x => parseInt(x, 16));
 
-  for (let i = 0; i < hexStr.length; i += 4) {
-
-    res.push(
-      parseInt(hexStr.slice(i, i + 4), 16)
-    );
-  }
-
-  return res;
 }
 
 // --------------------------------------------------
@@ -222,10 +195,6 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const output =
     document.getElementById("plaintext");
 
-  // --------------------------------------------
-  // Validasi input
-  // --------------------------------------------
-
   if (!cipherHex || !keyInput) {
 
     output.value =
@@ -234,17 +203,13 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
     return;
   }
 
-  // --------------------------------------------
-  // Parsing private key
-  // --------------------------------------------
-
   const match =
     keyInput.match(/\((\d+),\s*(\d+)\)/);
 
   if (!match) {
 
     output.value =
-      "Format private key salah. Gunakan (n, d)";
+      "Format private key salah.";
 
     return;
   }
@@ -255,9 +220,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const d =
     parseInt(match[2]);
 
-  // --------------------------------------------
-  // Hex -> Array Integer
-  // --------------------------------------------
+  // Hex -> Integer
 
   const C_perm =
     fromHexString(cipherHex);
@@ -265,17 +228,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const length =
     C_perm.length;
 
-  if (length % 2 !== 0) {
-
-    output.value =
-      "Ciphertext tidak valid.";
-
-    return;
-  }
-
-  // --------------------------------------------
-  // Inverse Permutation
-  // --------------------------------------------
+  // Inverse permutation
 
   let a = 5;
 
@@ -298,9 +251,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const C =
     inverse_perm.map(i => C_perm[i]);
 
-  // --------------------------------------------
   // Pisahkan Cu dan Cr
-  // --------------------------------------------
 
   const Cu =
     C.filter((_, i) => i % 2 === 0);
@@ -308,9 +259,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const Cr =
     C.filter((_, i) => i % 2 === 1);
 
-  // --------------------------------------------
-  // RSA Decryption
-  // --------------------------------------------
+  // RSA decryption
 
   const Du =
     Cu.map(cu => modPow(cu, d, n));
@@ -318,9 +267,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const Dr =
     Cr.map(cr => modPow(cr, d, n));
 
-  // --------------------------------------------
-  // Rekonstruksi Plaintext
-  // --------------------------------------------
+  // Rekonstruksi plaintext
 
   const M =
     Du.map((du, i) => (du + Dr[i]) % 256);
@@ -329,19 +276,6 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
     M.map(m => String.fromCharCode(m)).join("");
 
   output.value = plaintext;
-
-});
-
-// --------------------------------------------------
-// COPY BUTTON
-// --------------------------------------------------
-
-document.getElementById("copy-btn").addEventListener("click", () => {
-
-  const out =
-    document.getElementById("plaintext");
-
-  navigator.clipboard.writeText(out.value);
 
 });
 
