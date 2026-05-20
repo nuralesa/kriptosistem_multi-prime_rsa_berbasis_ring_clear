@@ -187,7 +187,7 @@ function modPow(base, exp, mod) {
 
   }
 
-  return Number(result);
+  return result;
 
 }
 
@@ -196,7 +196,7 @@ function fromHexString(hexStr) {
   return hexStr
     .trim()
     .split(/\s+/)
-    .map(x => parseInt(x, 16));
+    .map(x => BigInt("0x" + x));
 
 }
 
@@ -275,10 +275,10 @@ document
   }
 
   const n =
-    parseInt(match[1]);
+    BigInt(match[1]);
 
   const d =
-    parseInt(match[2]);
+    BigInt(match[2]);
 
   // --------------------------------------------------
   // HEX -> INTEGER
@@ -313,10 +313,8 @@ document
 
   }
 
-  // inverse dari a modulo length
-
   const a_inv =
-    modInverse(a, length);
+    Number(modInverse(a, length));
 
   const C =
     new Array(length);
@@ -370,7 +368,9 @@ document
   for (let i = 0; i < Du.length; i++) {
 
     const m =
-      (Du[i] + Dr[i]) % 256;
+      Number(
+        (Du[i] + Dr[i]) % 256n
+      );
 
     M.push(m);
 
