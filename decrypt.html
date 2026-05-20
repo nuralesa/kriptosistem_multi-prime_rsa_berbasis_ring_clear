@@ -45,6 +45,8 @@ body {
 
 <div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
 
+<!-- HEADER -->
+
 <header class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm">
 
   <div class="flex size-12 shrink-0 items-center justify-start">
@@ -68,6 +70,8 @@ body {
   <div class="flex size-12 shrink-0 items-center justify-end"></div>
 
 </header>
+
+<!-- MAIN -->
 
 <main class="flex flex-col gap-6 p-4 flex-1">
 
@@ -195,6 +199,8 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const output =
     document.getElementById("plaintext");
 
+  // VALIDASI
+
   if (!cipherHex || !keyInput) {
 
     output.value =
@@ -202,6 +208,8 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
 
     return;
   }
+
+  // PARSING PRIVATE KEY
 
   const match =
     keyInput.match(/\((\d+),\s*(\d+)\)/);
@@ -220,7 +228,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const d =
     parseInt(match[2]);
 
-  // Hex -> Integer
+  // HEX -> INTEGER
 
   const C_perm =
     fromHexString(cipherHex);
@@ -228,7 +236,15 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const length =
     C_perm.length;
 
-  // Inverse permutation
+  if (length % 2 !== 0) {
+
+    output.value =
+      "Ciphertext tidak valid.";
+
+    return;
+  }
+
+  // INVERSE PERMUTATION
 
   let a = 5;
 
@@ -251,7 +267,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const C =
     inverse_perm.map(i => C_perm[i]);
 
-  // Pisahkan Cu dan Cr
+  // PISAHKAN Cu DAN Cr
 
   const Cu =
     C.filter((_, i) => i % 2 === 0);
@@ -259,7 +275,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const Cr =
     C.filter((_, i) => i % 2 === 1);
 
-  // RSA decryption
+  // RSA DECRYPTION
 
   const Du =
     Cu.map(cu => modPow(cu, d, n));
@@ -267,10 +283,18 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
   const Dr =
     Cr.map(cr => modPow(cr, d, n));
 
-  // Rekonstruksi plaintext
+  // REKONSTRUKSI PLAINTEXT
 
-  const M =
-    Du.map((du, i) => (du + Dr[i]) % 256);
+  const M = [];
+
+  for (let i = 0; i < Du.length; i++) {
+
+    const m =
+      (Du[i] + Dr[i]) % 256;
+
+    M.push(m);
+
+  }
 
   const plaintext =
     M.map(m => String.fromCharCode(m)).join("");
