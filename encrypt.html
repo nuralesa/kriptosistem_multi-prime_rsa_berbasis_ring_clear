@@ -300,55 +300,31 @@ document
   const unitRegulars =
     Z.filter(isUnitRegular);
 
-  // --------------------------------------------------
-  // REPRESENTASI
-  // m = u + r
-  // --------------------------------------------------
+// --------------------------------------------------
+// REPRESENTASI
+// m = u + r mod 256
+// --------------------------------------------------
 
-  let u_list = [];
-  let r_list = [];
+let u_list = [];
+let r_list = [];
 
-  for (let m of asciiVals) {
+for (let m of asciiVals) {
 
-    let found = false;
+  // pilih unit tetap
+  // 1 adalah unit di Z256
 
-    for (let u of units) {
+  const u = 1;
 
-      for (let r of unitRegulars) {
+  // r = m - u mod 256
 
-        if (
-          (u + r) % 256 === m
-        ) {
+  const r =
+    (m - u + 256) % 256;
 
-          u_list.push(u);
+  u_list.push(u);
 
-          r_list.push(r);
+  r_list.push(r);
 
-          found = true;
-
-          break;
-
-        }
-
-      }
-
-      if (found) break;
-
-    }
-
-    // fallback
-
-    if (!found) {
-
-      u_list.push(1);
-
-      r_list.push(
-        (m - 1 + 256) % 256
-      );
-
-    }
-
-  }
+}
 
   // --------------------------------------------------
   // RSA ENCRYPTION
