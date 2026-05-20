@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Enkripsi</title>
+<title>Kriptosistem - Enkripsi & Dekripsi</title>
 
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
@@ -29,12 +29,15 @@ tailwind.config = {
 </script>
 
 <style>
+
 .material-symbols-outlined {
   font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24
 }
+
 body {
   min-height: max(884px, 100dvh);
 }
+
 </style>
 </head>
 
@@ -42,92 +45,151 @@ body {
 
 <div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
 
-<!-- Header -->
+<!-- HEADER -->
+
 <header class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm">
 
   <div class="flex size-12 shrink-0 items-center justify-start">
-    <button onclick="window.location.href='menu.html'"
+    <button
+      onclick="window.location.reload()"
       class="flex size-12 cursor-pointer items-center justify-center rounded-full text-gray-900 dark:text-white hover:bg-gray-500/10 transition-colors">
-      <span class="material-symbols-outlined">arrow_back</span>
+
+      <span class="material-symbols-outlined">
+        refresh
+      </span>
+
     </button>
   </div>
 
   <h1 class="text-gray-900 dark:text-white text-lg font-bold flex-1 text-center px-2">
-    Enkripsi
+
+    Multi-Prime RSA Clear Ring
+
   </h1>
 
   <div class="flex size-12 shrink-0 items-center justify-end"></div>
 
 </header>
 
-<!-- Main -->
+<!-- MAIN -->
+
 <main class="flex flex-col gap-6 p-4 flex-1">
 
-  <!-- Input plaintext -->
+  <!-- PLAINTEXT -->
+
   <div class="flex flex-col gap-2">
+
     <label class="text-gray-800 dark:text-gray-100 text-base font-medium">
       Teks Asli
     </label>
 
     <textarea
       id="input-text"
-      placeholder="Ketik atau tempel teks Anda di sini..."
+      placeholder="Masukkan plaintext..."
       class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 min-h-40 p-4 text-base"></textarea>
+
   </div>
 
-  <!-- Input kunci publik -->
+  <!-- PUBLIC KEY -->
+
   <div class="flex flex-col gap-2">
+
     <label class="text-gray-800 dark:text-gray-100 text-base font-medium">
-      Kunci Publik
+      Kunci Publik (n, e)
     </label>
 
     <input
-      id="public-key-input"
-      placeholder="Masukkan kunci publik (n, e)"
+      id="public-key"
+      placeholder="Contoh: (3233, 17)"
       class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"/>
+
   </div>
 
-  <!-- Tombol Enkripsi -->
+  <!-- ENCRYPT BUTTON -->
+
   <div class="py-2">
+
     <button
       id="encrypt-btn"
       class="flex w-full items-center justify-center gap-2 rounded-xl h-14 px-5 bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
 
-      <span class="material-symbols-outlined">lock</span>
-      <span>Enkripsi</span>
+      <span class="material-symbols-outlined">
+        lock
+      </span>
+
+      <span>
+        Enkripsi
+      </span>
 
     </button>
+
   </div>
 
-  <!-- Output -->
+  <!-- CIPHERTEXT -->
+
   <div class="flex flex-col gap-2">
 
     <label class="text-gray-800 dark:text-gray-100 text-base font-medium">
-      Teks Terenkripsi
+      Ciphertext
     </label>
 
-    <div class="relative">
+    <textarea
+      id="ciphertext"
+      readonly
+      placeholder="Hasil ciphertext..."
+      class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-40 p-4 text-base"></textarea>
 
-      <textarea
-        id="output-text"
-        readonly
-        placeholder="Hasil enkripsi akan muncul di sini."
-        class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-40 p-4 text-base pr-12"></textarea>
+  </div>
 
-      <div class="absolute top-3 right-3">
+  <!-- PRIVATE KEY -->
 
-        <button
-          id="copy-btn"
-          class="flex size-8 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+  <div class="flex flex-col gap-2">
 
-          <span class="material-symbols-outlined text-base">
-            content_copy
-          </span>
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium">
+      Kunci Pribadi (n, d)
+    </label>
 
-        </button>
+    <input
+      id="private-key"
+      placeholder="Contoh: (3233, 2753)"
+      class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"/>
 
-      </div>
-    </div>
+  </div>
+
+  <!-- DECRYPT BUTTON -->
+
+  <div class="py-2">
+
+    <button
+      id="decrypt-btn"
+      class="flex w-full items-center justify-center gap-2 rounded-xl h-14 px-5 bg-green-600 text-white font-bold hover:bg-green-700 transition-colors">
+
+      <span class="material-symbols-outlined">
+        lock_open
+      </span>
+
+      <span>
+        Dekripsi
+      </span>
+
+    </button>
+
+  </div>
+
+  <!-- DECRYPT RESULT -->
+
+  <div class="flex flex-col gap-2">
+
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium">
+      Hasil Dekripsi
+    </label>
+
+    <textarea
+      id="decrypt-result"
+      readonly
+      placeholder="Hasil dekripsi..."
+      class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-40 p-4 text-base"></textarea>
+
   </div>
 
 </main>
@@ -135,70 +197,107 @@ body {
 
 <script>
 
-// ----------------------------------
-// Fungsi bantu
-// ----------------------------------
+// --------------------------------------------------
+// FUNGSI BANTU
+// --------------------------------------------------
 
 function gcd(a, b) {
   return b === 0 ? a : gcd(b, a % b);
 }
 
-function pow256(x, exp) {
-  return Number(BigInt(x) ** BigInt(exp) % 256n);
+function modPow(base, exp, mod) {
+
+  let result = 1n;
+
+  let b = BigInt(base);
+  let e = BigInt(exp);
+  let m = BigInt(mod);
+
+  while (e > 0n) {
+
+    if (e % 2n === 1n) {
+      result = (result * b) % m;
+    }
+
+    b = (b * b) % m;
+    e /= 2n;
+  }
+
+  return Number(result);
 }
 
 function toHex(x) {
-  return x.toString(16).padStart(2, "0").toUpperCase();
+  return x.toString(16).padStart(4, "0").toUpperCase();
 }
 
-// ----------------------------------
-// Enkripsi
-// ----------------------------------
+function fromHexString(hexStr) {
+
+  const res = [];
+
+  for (let i = 0; i < hexStr.length; i += 4) {
+
+    res.push(
+      parseInt(hexStr.slice(i, i + 4), 16)
+    );
+  }
+
+  return res;
+}
+
+// --------------------------------------------------
+// ENKRIPSI
+// --------------------------------------------------
 
 document.getElementById("encrypt-btn").addEventListener("click", () => {
 
   const plaintext =
-    document.getElementById("input-text").value.trim();
+    document.getElementById("input-text").value;
 
   const keyInput =
-    document.getElementById("public-key-input").value.trim();
+    document.getElementById("public-key").value.trim();
 
   const output =
-    document.getElementById("output-text");
+    document.getElementById("ciphertext");
 
   if (!plaintext || !keyInput) {
-    output.value = "Mohon isi teks dan kunci publik.";
+
+    output.value =
+      "Mohon isi plaintext dan kunci publik.";
+
     return;
   }
 
-  // parsing (n, e)
+  // --------------------------------------------
+  // Parsing public key
+  // --------------------------------------------
 
-  const match = keyInput.match(/\((\d+),\s*(\d+)\)/);
+  const match =
+    keyInput.match(/\((\d+),\s*(\d+)\)/);
 
   if (!match) {
-    output.value = "Format kunci publik salah. Gunakan (n, e)";
+
+    output.value =
+      "Format kunci publik salah.";
+
     return;
   }
 
-  const e = parseInt(match[2]);
+  const n =
+    parseInt(match[1]);
+
+  const e =
+    parseInt(match[2]);
+
+  // --------------------------------------------
+  // ASCII
+  // --------------------------------------------
 
   const asciiVals =
     Array.from(plaintext).map(ch => ch.charCodeAt(0));
 
-  if (asciiVals.some(x => x < 0 || x > 255)) {
-    output.value =
-      "❌ Karakter tidak bisa diproses (di luar 0–255)";
-    return;
-  }
-
-  if (asciiVals.length === 0) {
-    output.value = "❌ Plaintext kosong.";
-    return;
-  }
-
-  // ----------------------------------
-  // Unit & unit reguler di Z_256
-  // ----------------------------------
+  // --------------------------------------------
+  // Unit dan Unit Regular
+  // --------------------------------------------
 
   const Z =
     Array.from({length: 256}, (_, i) => i);
@@ -207,6 +306,7 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
     Z.filter(a => gcd(a, 256) === 1);
 
   function isUnitRegular(a) {
+
     return units.some(
       u => (a * u * a) % 256 === a
     );
@@ -215,9 +315,9 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
   const unitRegulars =
     Z.filter(isUnitRegular);
 
-  // ----------------------------------
-  // Pasangan (u_i, r_i)
-  // ----------------------------------
+  // --------------------------------------------
+  // Split m = u + r
+  // --------------------------------------------
 
   let u_list = [];
   let r_list = [];
@@ -251,25 +351,28 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
     }
   }
 
-  // ----------------------------------
-  // Enkripsi di Z_256
-  // ----------------------------------
+  // --------------------------------------------
+  // RSA Encryption
+  // --------------------------------------------
 
   const Cu =
-    u_list.map(u => pow256(u, e));
+    u_list.map(u => modPow(u, e, n));
 
   const Cr =
-    r_list.map(r => pow256(r, e));
+    r_list.map(r => modPow(r, e, n));
 
   const C = [];
 
   for (let i = 0; i < Cu.length; i++) {
-    C.push(Cu[i], Cr[i]);
+
+    C.push(Cu[i]);
+    C.push(Cr[i]);
+
   }
 
-  // ----------------------------------
-  // Permutasi bijektif sederhana
-  // ----------------------------------
+  // --------------------------------------------
+  // Permutasi Bijektif
+  // --------------------------------------------
 
   let a = 5;
 
@@ -279,28 +382,133 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
     a = 3;
   }
 
-  // PERBAIKAN
   const perm =
     Array.from({length}, (_, i) => (a * i) % length);
 
   const C_perm =
     perm.map(i => C[i]);
 
-  const cipherHexAfter =
+  // --------------------------------------------
+  // Convert ke Hex
+  // --------------------------------------------
+
+  const cipherHex =
     C_perm.map(toHex).join("");
 
-  output.value = cipherHexAfter;
+  output.value = cipherHex;
 
 });
 
-// Tombol salin
+// --------------------------------------------------
+// DEKRIPSI
+// --------------------------------------------------
 
-document.getElementById("copy-btn").addEventListener("click", () => {
+document.getElementById("decrypt-btn").addEventListener("click", () => {
 
-  const out =
-    document.getElementById("output-text");
+  const cipherHex =
+    document.getElementById("ciphertext").value.trim();
 
-  navigator.clipboard.writeText(out.value);
+  const keyInput =
+    document.getElementById("private-key").value.trim();
+
+  const output =
+    document.getElementById("decrypt-result");
+
+  if (!cipherHex || !keyInput) {
+
+    output.value =
+      "Mohon isi ciphertext dan private key.";
+
+    return;
+  }
+
+  // --------------------------------------------
+  // Parsing private key
+  // --------------------------------------------
+
+  const match =
+    keyInput.match(/\((\d+),\s*(\d+)\)/);
+
+  if (!match) {
+
+    output.value =
+      "Format private key salah.";
+
+    return;
+  }
+
+  const n =
+    parseInt(match[1]);
+
+  const d =
+    parseInt(match[2]);
+
+  // --------------------------------------------
+  // Hex -> Array
+  // --------------------------------------------
+
+  const C_perm =
+    fromHexString(cipherHex);
+
+  const length =
+    C_perm.length;
+
+  // --------------------------------------------
+  // Inverse Permutation
+  // --------------------------------------------
+
+  let a = 5;
+
+  if (gcd(a, length) !== 1) {
+    a = 3;
+  }
+
+  const perm =
+    Array.from({length}, (_, i) => (a * i) % length);
+
+  const inverse_perm =
+    Array(length).fill(0);
+
+  for (let i = 0; i < length; i++) {
+
+    inverse_perm[perm[i]] = i;
+
+  }
+
+  const C =
+    inverse_perm.map(i => C_perm[i]);
+
+  // --------------------------------------------
+  // Pisahkan Cu dan Cr
+  // --------------------------------------------
+
+  const Cu =
+    C.filter((_, i) => i % 2 === 0);
+
+  const Cr =
+    C.filter((_, i) => i % 2 === 1);
+
+  // --------------------------------------------
+  // RSA Decryption
+  // --------------------------------------------
+
+  const Du =
+    Cu.map(cu => modPow(cu, d, n));
+
+  const Dr =
+    Cr.map(cr => modPow(cr, d, n));
+
+  // --------------------------------------------
+  // Rekonstruksi Plaintext
+  // --------------------------------------------
+
+  const M =
+    Du.map((du, i) => (du + Dr[i]) % 256);
+
+  const plaintext =
+    M.map(m => String.fromCharCode(m)).join("");
+
+  output.value = plaintext;
 
 });
 
