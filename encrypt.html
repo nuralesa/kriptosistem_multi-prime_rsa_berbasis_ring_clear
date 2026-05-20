@@ -50,8 +50,9 @@ body {
 <header class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm">
 
   <div class="flex size-12 shrink-0 items-center justify-start">
+
     <button
-  onclick="window.location.href='menu.html'"
+      onclick="window.location.href='menu.html'"
       class="flex size-12 cursor-pointer items-center justify-center rounded-full text-gray-900 dark:text-white hover:bg-gray-500/10 transition-colors">
 
       <span class="material-symbols-outlined">
@@ -59,12 +60,11 @@ body {
       </span>
 
     </button>
+
   </div>
 
   <h1 class="text-gray-900 dark:text-white text-lg font-bold flex-1 text-center px-2">
-
     Enkripsi
-
   </h1>
 
   <div class="flex size-12 shrink-0 items-center justify-end"></div>
@@ -176,21 +176,7 @@ function modPow(base, exp, mod) {
 }
 
 function toHex(x) {
-  return x.toString(16).padStart(4, "0").toUpperCase();
-}
-
-function fromHexString(hexStr) {
-
-  const res = [];
-
-  for (let i = 0; i < hexStr.length; i += 4) {
-
-    res.push(
-      parseInt(hexStr.slice(i, i + 4), 16)
-    );
-  }
-
-  return res;
+  return x.toString(16).toUpperCase();
 }
 
 // --------------------------------------------------
@@ -216,9 +202,7 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
     return;
   }
 
-  // --------------------------------------------
   // Parsing public key
-  // --------------------------------------------
 
   const match =
     keyInput.match(/\((\d+),\s*(\d+)\)/);
@@ -237,16 +221,12 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
   const e =
     parseInt(match[2]);
 
-  // --------------------------------------------
   // ASCII
-  // --------------------------------------------
 
   const asciiVals =
     Array.from(plaintext).map(ch => ch.charCodeAt(0));
 
-  // --------------------------------------------
   // Unit dan Unit Regular
-  // --------------------------------------------
 
   const Z =
     Array.from({length: 256}, (_, i) => i);
@@ -264,9 +244,7 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
   const unitRegulars =
     Z.filter(isUnitRegular);
 
-  // --------------------------------------------
   // Split m = u + r
-  // --------------------------------------------
 
   let u_list = [];
   let r_list = [];
@@ -300,9 +278,7 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
     }
   }
 
-  // --------------------------------------------
   // RSA Encryption
-  // --------------------------------------------
 
   const Cu =
     u_list.map(u => modPow(u, e, n));
@@ -319,9 +295,7 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
 
   }
 
-  // --------------------------------------------
-  // Permutasi Bijektif
-  // --------------------------------------------
+  // Permutasi
 
   let a = 5;
 
@@ -337,12 +311,10 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
   const C_perm =
     perm.map(i => C[i]);
 
-  // --------------------------------------------
-  // Convert ke Hex
-  // --------------------------------------------
+  // Convert ke hex
 
   const cipherHex =
-    C_perm.map(toHex).join("");
+    C_perm.map(toHex).join(" ");
 
   output.value = cipherHex;
 
