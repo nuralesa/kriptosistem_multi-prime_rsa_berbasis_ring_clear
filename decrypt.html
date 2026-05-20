@@ -1,3 +1,92 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kriptosistem - Dekripsi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#1173d4",
+        "background-light": "#f6f7f8",
+        "background-dark": "#101922",
+      },
+      fontFamily: {
+        "display": ["Inter", "sans-serif"]
+      },
+    },
+  },
+}
+</script>
+
+<style>
+.material-symbols-outlined {
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24
+}
+body { min-height: max(884px, 100dvh); }
+</style>
+</head>
+
+<body class="font-display">
+<div class="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark">
+
+<!-- Header -->
+<header class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light dark:bg-background-dark/80 backdrop-blur-sm">
+  <div class="flex size-12 shrink-0 items-center justify-start">
+    <button onclick="window.location.href='menu.html'"
+      class="flex size-12 cursor-pointer items-center justify-center rounded-full text-gray-900 dark:text-white hover:bg-gray-500/10 transition-colors">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+  </div>
+  <h1 class="text-gray-900 dark:text-white text-lg font-bold flex-1 text-center">Dekripsi</h1>
+  <div class="flex size-12 shrink-0 items-center justify-end"></div>
+</header>
+
+<!-- Main -->
+<main class="flex flex-col gap-4 p-4 flex-1">
+  <div class="flex flex-col gap-2">
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium" for="encrypted-text">Teks Terenkripsi</label>
+    <textarea id="encrypted-text" placeholder="Ketik atau tempel teks terenkripsi di sini..."
+      class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 min-h-40 p-4 text-base"></textarea>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium" for="private-key">Kunci Pribadi (n, d)</label>
+    <input id="private-key" placeholder="Masukkan kunci pribadi, format (n, d)"
+      class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"/>
+  </div>
+
+  <div class="py-2">
+    <button id="decrypt-btn"
+      class="flex w-full items-center justify-center gap-2 rounded-xl h-14 px-5 bg-primary text-white font-bold hover:bg-primary/90 transition-colors">
+      <span class="material-symbols-outlined">lock_open</span>
+      <span>Dekripsi</span>
+    </button>
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <label class="text-gray-800 dark:text-gray-100 text-base font-medium" for="original-text">Teks Asli</label>
+    <div class="relative">
+      <textarea id="original-text" readonly placeholder="Hasil dekripsi akan muncul di sini."
+        class="form-input w-full resize-none rounded-xl text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50 min-h-40 p-4 text-base pr-12"></textarea>
+      <div class="absolute top-3 right-3">
+        <button id="copy-btn"
+          class="flex size-8 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+          <span class="material-symbols-outlined text-base">content_copy</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
 <script>
 
 // ------------------------------------
@@ -66,6 +155,10 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
     return;
   }
 
+  // ------------------------------------
+  // Parsing kunci
+  // ------------------------------------
+
   const match =
     keyInput.match(/\((\d+),\s*(\d+)\)/);
 
@@ -79,6 +172,10 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
 
   const n = parseInt(match[1]);
   const d = parseInt(match[2]);
+
+  // ------------------------------------
+  // Konversi ciphertext hex -> array byte
+  // ------------------------------------
 
   const C_perm =
     fromHexString(cipherHex);
@@ -104,7 +201,7 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
     a = 3;
   }
 
-  // PERBAIKAN
+  // FIX
   const perm =
     Array.from({length}, (_, i) => (a * i) % length);
 
@@ -112,7 +209,9 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
     Array(length).fill(0);
 
   for (let i = 0; i < length; i++) {
+
     inverse_perm[perm[i]] = i;
+
   }
 
   const C =
@@ -153,7 +252,9 @@ document.getElementById("decrypt-btn").addEventListener("click", () => {
 
 });
 
+// ------------------------------------
 // Tombol salin
+// ------------------------------------
 
 document.getElementById("copy-btn").addEventListener("click", () => {
 
@@ -165,3 +266,5 @@ document.getElementById("copy-btn").addEventListener("click", () => {
 });
 
 </script>
+</body>
+</html>
