@@ -151,48 +151,79 @@ body {
 // --------------------------------------------------
 
 function gcd(a, b) {
-  return b === 0 ? a : gcd(b, a % b);
+
+  return b === 0
+    ? a
+    : gcd(b, a % b);
+
 }
 
 function modPow(base, exp, mod) {
 
   let result = 1n;
 
-  let b = BigInt(base);
-  let e = BigInt(exp);
-  let m = BigInt(mod);
+  let b =
+    BigInt(base);
+
+  let e =
+    BigInt(exp);
+
+  let m =
+    BigInt(mod);
 
   while (e > 0n) {
 
     if (e % 2n === 1n) {
-      result = (result * b) % m;
+
+      result =
+        (result * b) % m;
+
     }
 
-    b = (b * b) % m;
+    b =
+      (b * b) % m;
+
     e /= 2n;
+
   }
 
   return Number(result);
+
 }
 
 function toHex(x) {
-  return x.toString(16).toUpperCase();
+
+  return x
+    .toString(16)
+    .toUpperCase()
+    .padStart(2, "0");
+
 }
 
 // --------------------------------------------------
 // ENKRIPSI
 // --------------------------------------------------
 
-document.getElementById("encrypt-btn").addEventListener("click", () => {
+document
+  .getElementById("encrypt-btn")
+  .addEventListener("click", () => {
 
   const plaintext =
-    document.getElementById("input-text").value;
+    document
+      .getElementById("input-text")
+      .value;
 
   const keyInput =
-    document.getElementById("public-key").value.trim();
+    document
+      .getElementById("public-key")
+      .value
+      .trim();
 
   const output =
-    document.getElementById("ciphertext");
+    document
+      .getElementById("ciphertext");
+
+  // VALIDASI
 
   if (!plaintext || !keyInput) {
 
@@ -200,9 +231,12 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
       "Mohon isi plaintext dan kunci publik.";
 
     return;
+
   }
 
-  // Parsing public key
+  // --------------------------------------------------
+  // PARSING PUBLIC KEY
+  // --------------------------------------------------
 
   const match =
     keyInput.match(/\((\d+),\s*(\d+)\)/);
@@ -213,6 +247,7 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
       "Format kunci publik salah.";
 
     return;
+
   }
 
   const n =
@@ -221,30 +256,54 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
   const e =
     parseInt(match[2]);
 
-  // ASCII
+  // --------------------------------------------------
+  // KONVERSI ASCII
+  // --------------------------------------------------
 
   const asciiVals =
-    Array.from(plaintext).map(ch => ch.charCodeAt(0));
+    Array.from(plaintext)
+      .map(ch => ch.charCodeAt(0));
 
-  // Unit dan Unit Regular
+  // --------------------------------------------------
+  // PEMBENTUKAN Z_256
+  // --------------------------------------------------
 
   const Z =
-    Array.from({length: 256}, (_, i) => i);
+    Array.from(
+      {length: 256},
+      (_, i) => i
+    );
+
+  // --------------------------------------------------
+  // HIMPUNAN UNIT
+  // gcd(a,256)=1
+  // --------------------------------------------------
 
   const units =
-    Z.filter(a => gcd(a, 256) === 1);
+    Z.filter(
+      a => gcd(a, 256) === 1
+    );
+
+  // --------------------------------------------------
+  // HIMPUNAN UNIT REGULAR
+  // --------------------------------------------------
 
   function isUnitRegular(a) {
 
-    return units.some(
-      u => (a * u * a) % 256 === a
+    return Z.some(
+      x =>
+        (a * x * a) % 256 === a
     );
+
   }
 
   const unitRegulars =
     Z.filter(isUnitRegular);
 
-  // Split m = u + r
+  // --------------------------------------------------
+  // REPRESENTASI
+  // m = u + r
+  // --------------------------------------------------
 
   let u_list = [];
   let r_list = [];
@@ -257,69 +316,117 @@ document.getElementById("encrypt-btn").addEventListener("click", () => {
 
       for (let r of unitRegulars) {
 
-        if ((u + r) % 256 === m) {
+        if (
+          (u + r) % 256 === m
+        ) {
 
           u_list.push(u);
+
           r_list.push(r);
 
           found = true;
+
           break;
+
         }
+
       }
 
       if (found) break;
+
     }
+
+    // fallback
 
     if (!found) {
 
-      u_list.push((m + 1) % 256);
-      r_list.push((m - 1 + 256) % 256);
+      u_list.push(1);
+
+      r_list.push(
+        (m - 1 + 256) % 256
+      );
 
     }
+
   }
 
-  // RSA Encryption
+  // --------------------------------------------------
+  // RSA ENCRYPTION
+  // Cu = u^e mod n
+  // Cr = r^e mod n
+  // --------------------------------------------------
 
   const Cu =
-    u_list.map(u => modPow(u, e, n));
+    u_list.map(
+      u => modPow(u, e, n)
+    );
 
   const Cr =
-    r_list.map(r => modPow(r, e, n));
+    r_list.map(
+      r => modPow(r, e, n)
+    );
+
+  // --------------------------------------------------
+  // PEMBENTUKAN C
+  // C=(Cu1,Cr1,Cu2,Cr2,...)
+  // --------------------------------------------------
 
   const C = [];
 
   for (let i = 0; i < Cu.length; i++) {
 
     C.push(Cu[i]);
+
     C.push(Cr[i]);
 
   }
 
-  // Permutasi
+  // --------------------------------------------------
+  // PERMUTASI
+  // C' = π(C)
+  // --------------------------------------------------
 
   let a = 5;
 
-  const length = C.length;
+  const length =
+    C.length;
 
-  if (gcd(a, length) !== 1) {
-    a = 3;
+  while (
+    gcd(a, length) !== 1
+  ) {
+
+    a++;
+
   }
 
-  const perm =
-    Array.from({length}, (_, i) => (a * i) % length);
-
   const C_perm =
-    perm.map(i => C[i]);
+    new Array(length);
 
-  // Convert ke hex
+  for (let i = 0; i < length; i++) {
+
+    const j =
+      (a * i) % length;
+
+    C_perm[j] =
+      C[i];
+
+  }
+
+  // --------------------------------------------------
+  // KONVERSI HEX
+  // --------------------------------------------------
 
   const cipherHex =
-    C_perm.map(toHex).join(" ");
+    C_perm
+      .map(toHex)
+      .join(" ");
 
-  output.value = cipherHex;
+  output.value =
+    cipherHex;
 
 });
 
 </script>
+
 </body>
 </html>
