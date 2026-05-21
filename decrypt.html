@@ -230,11 +230,11 @@ function fromHexString(hexStr) {
 
   const result = [];
 
-  for (let i = 0; i < cleanHex.length; i += 2) {
+  for (let i = 0; i < cleanHex.length; i += 4) {
 
     result.push(
       parseInt(
-        cleanHex.substring(i, i + 2),
+        cleanHex.substring(i, i + 4),
         16
       )
     );
@@ -367,7 +367,7 @@ document
   const Cu = [];
   const Cr = [];
 
-  for (let i = 0; i < C.length; i += 2) {
+  for (let i = 0; i < cleanHex.length; i += 4) {
 
     Cu.push(C[i]);
     Cr.push(C[i + 1]);
