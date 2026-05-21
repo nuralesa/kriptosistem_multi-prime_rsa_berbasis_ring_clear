@@ -100,7 +100,7 @@ body {
 
     <input
       id="private-key"
-      placeholder="Contoh: (3233, 2753)"
+      placeholder="Contoh: (8671, 7003)"
       class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"/>
 
   </div>
@@ -162,14 +162,11 @@ function modPow(base, exp, mod) {
 
   let result = 1n;
 
-  let b =
-    BigInt(base);
+  let b = BigInt(base);
 
-  let e =
-    BigInt(exp);
+  let e = BigInt(exp);
 
-  let m =
-    BigInt(mod);
+  let m = BigInt(mod);
 
   while (e > 0n) {
 
@@ -188,15 +185,6 @@ function modPow(base, exp, mod) {
   }
 
   return Number(result);
-
-}
-
-function fromHexString(hexStr) {
-
-  return hexStr
-    .trim()
-    .split(/\s+/)
-    .map(x => parseInt(x, 16));
 
 }
 
@@ -220,12 +208,38 @@ function modInverse(a, m) {
 }
 
 // --------------------------------------------------
+// HEX TANPA SPASI
+// --------------------------------------------------
+
+function fromHexString(hexStr) {
+
+  const cleanHex =
+    hexStr.replace(/\s+/g, "");
+
+  const result = [];
+
+  for (let i = 0; i < cleanHex.length; i += 2) {
+
+    result.push(
+      parseInt(
+        cleanHex.substring(i, i + 2),
+        16
+      )
+    );
+
+  }
+
+  return result;
+
+}
+
+// --------------------------------------------------
 // DEKRIPSI
 // --------------------------------------------------
 
 document
-  .getElementById("decrypt-btn")
-  .addEventListener("click", () => {
+.getElementById("decrypt-btn")
+.addEventListener("click", () => {
 
   const cipherHex =
     document
@@ -243,9 +257,7 @@ document
     document
       .getElementById("plaintext");
 
-  // --------------------------------------------------
   // VALIDASI
-  // --------------------------------------------------
 
   if (!cipherHex || !keyInput) {
 
@@ -256,9 +268,7 @@ document
 
   }
 
-  // --------------------------------------------------
-  // PARSING PRIVATE KEY
-  // --------------------------------------------------
+  // PARSING KEY
 
   const match =
     keyInput.match(/\((\d+),\s*(\d+)\)/);
@@ -279,23 +289,32 @@ document
     parseInt(match[2]);
 
   // --------------------------------------------------
-// HEX -> INTEGER
-// --------------------------------------------------
+  // HEX -> INTEGER
+  // --------------------------------------------------
 
-const C_perm =
-  fromHexString(cipherHex);
+  const C_perm =
+    fromHexString(cipherHex);
 
-const length =
-  C_perm.length;
+  const length =
+    C_perm.length;
 
-if (length === 0) {
+  if (length === 0) {
 
-  output.value =
-    "Ciphertext kosong.";
+    output.value =
+      "Ciphertext kosong.";
 
-  return;
+    return;
 
-}
+  }
+
+  if (length % 2 !== 0) {
+
+    output.value =
+      "Ciphertext tidak valid.";
+
+    return;
+
+  }
 
   // --------------------------------------------------
   // INVERSE PERMUTATION
@@ -328,23 +347,61 @@ if (length === 0) {
   }
 
   // --------------------------------------------------
-  // RSA DECRYPTION
-  // M = C^d mod n
+  // PISAH Cu DAN Cr
   // --------------------------------------------------
 
-  const M =
-    C.map(
-      c => modPow(c, d, n)
+  const Cu = [];
+  const Cr = [];
+
+  for (let i = 0; i < C.length; i += 2) {
+
+    Cu.push(C[i]);
+    Cr.push(C[i + 1]);
+
+  }
+
+  // --------------------------------------------------
+  // RSA DECRYPTION
+  // --------------------------------------------------
+
+  const u_list =
+    Cu.map(
+      cu => modPow(cu, d, 256)
+    );
+
+  const r_list =
+    Cr.map(
+      cr => modPow(cr, d, 256)
     );
 
   // --------------------------------------------------
-  // ASCII
+  // REKONSTRUKSI
+  // mi = ui + ri mod 256
   // --------------------------------------------------
 
+  const bytes = [];
+
+  for (let i = 0; i < u_list.length; i++) {
+
+    const m =
+      (u_list[i] + r_list[i]) % 256;
+
+    bytes.push(m);
+
+  }
+
+  // --------------------------------------------------
+  // UTF-8 DECODE
+  // SUPPORT SIMBOL
+  // --------------------------------------------------
+
+  const decoder =
+    new TextDecoder();
+
   const plaintext =
-    M.map(
-      m => String.fromCharCode(m)
-    ).join("");
+    decoder.decode(
+      new Uint8Array(bytes)
+    );
 
   output.value =
     plaintext;
