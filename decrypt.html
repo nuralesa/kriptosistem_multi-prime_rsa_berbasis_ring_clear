@@ -187,7 +187,7 @@ function modPow(base, exp, mod) {
 
   }
 
-  return result;
+  return Number(result);
 
 }
 
@@ -196,13 +196,9 @@ function fromHexString(hexStr) {
   return hexStr
     .trim()
     .split(/\s+/)
-    .map(x => BigInt("0x" + x));
+    .map(x => parseInt(x, 16));
 
 }
-
-// --------------------------------------------------
-// MODULAR INVERSE
-// --------------------------------------------------
 
 function modInverse(a, m) {
 
@@ -247,7 +243,9 @@ document
     document
       .getElementById("plaintext");
 
+  // --------------------------------------------------
   // VALIDASI
+  // --------------------------------------------------
 
   if (!cipherHex || !keyInput) {
 
@@ -275,10 +273,10 @@ document
   }
 
   const n =
-    BigInt(match[1]);
+    parseInt(match[1]);
 
   const d =
-    BigInt(match[2]);
+    parseInt(match[2]);
 
   // --------------------------------------------------
   // HEX -> INTEGER
@@ -289,15 +287,6 @@ document
 
   const length =
     C_perm.length;
-
-  if (length % 2 !== 0) {
-
-    output.value =
-      "Ciphertext tidak valid.";
-
-    return;
-
-  }
 
   // --------------------------------------------------
   // INVERSE PERMUTATION
@@ -314,7 +303,7 @@ document
   }
 
   const a_inv =
-    Number(modInverse(a, length));
+    modInverse(a, length);
 
   const C =
     new Array(length);
@@ -330,51 +319,14 @@ document
   }
 
   // --------------------------------------------------
-  // PISAHKAN Cu DAN Cr
-  // --------------------------------------------------
-
-  const Cu = [];
-  const Cr = [];
-
-  for (let i = 0; i < C.length; i += 2) {
-
-    Cu.push(C[i]);
-
-    Cr.push(C[i + 1]);
-
-  }
-
-  // --------------------------------------------------
   // RSA DECRYPTION
+  // M = C^d mod n
   // --------------------------------------------------
 
-  const Du =
-    Cu.map(
-      cu => modPow(cu, d, n)
+  const M =
+    C.map(
+      c => modPow(c, d, n)
     );
-
-  const Dr =
-    Cr.map(
-      cr => modPow(cr, d, n)
-    );
-
-  // --------------------------------------------------
-  // REKONSTRUKSI
-  // mi = ui + ri mod 256
-  // --------------------------------------------------
-
-  const M = [];
-
-  for (let i = 0; i < Du.length; i++) {
-
-    const m =
-      Number(
-        (Du[i] + Dr[i]) % 256n
-      );
-
-    M.push(m);
-
-  }
 
   // --------------------------------------------------
   // ASCII
