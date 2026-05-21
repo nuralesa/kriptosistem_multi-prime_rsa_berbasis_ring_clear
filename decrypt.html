@@ -156,9 +156,17 @@ body {
 
 function gcd(a, b) {
 
-  return b === 0
-    ? a
-    : gcd(b, a % b);
+  while (b !== 0) {
+
+    const temp = b;
+
+    b = a % b;
+
+    a = temp;
+
+  }
+
+  return a;
 
 }
 
@@ -230,13 +238,19 @@ function fromHexString(hexStr) {
 
   const result = [];
 
-  for (let i = 0; i < cleanHex.length; i += 4) {
+  for (
+    let i = 0;
+    i < cleanHex.length;
+    i += 4
+  ) {
 
     result.push(
+
       parseInt(
         cleanHex.substring(i, i + 4),
         16
       )
+
     );
 
   }
@@ -269,7 +283,9 @@ document
     document
       .getElementById("plaintext");
 
-  // VALIDASI
+  // --------------------------------------------------
+  // VALIDASI INPUT
+  // --------------------------------------------------
 
   if (!cipherHex || !keyInput) {
 
@@ -297,10 +313,32 @@ document
   }
 
   const d =
-  parseInt(match[1]);
+    parseInt(match[1]);
 
   const n =
-  parseInt(match[2]);
+    parseInt(match[2]);
+
+  // --------------------------------------------------
+  // VALIDASI n
+  // --------------------------------------------------
+
+  if (n <= 255) {
+
+    output.value =
+      "Nilai n harus lebih besar dari 255.";
+
+    return;
+
+  }
+
+  if (n >= 65536) {
+
+    output.value =
+      "Nilai n harus kurang dari 65536.";
+
+    return;
+
+  }
 
   // --------------------------------------------------
   // HEX -> INTEGER
@@ -365,12 +403,18 @@ document
   // --------------------------------------------------
 
   const Cu = [];
+
   const Cr = [];
 
-  for (let i = 0; i < C.length; i += 2) {
+  for (
+    let i = 0;
+    i < C.length;
+    i += 2
+  ) {
 
-  Cu.push(C[i]);
-  Cr.push(C[i + 1]);
+    Cu.push(C[i]);
+
+    Cr.push(C[i + 1]);
 
   }
 
@@ -389,15 +433,19 @@ document
     );
 
   // --------------------------------------------------
-  // REKONSTRUKSI
+  // REKONSTRUKSI BYTE
   // --------------------------------------------------
 
   const bytes = [];
 
-  for (let i = 0; i < u_list.length; i++) {
+  for (
+    let i = 0;
+    i < u_list.length;
+    i++
+  ) {
 
     const m =
-      (u_list[i] + r_list[i]) % 256;
+      u_list[i] + r_list[i];
 
     bytes.push(m);
 
@@ -407,16 +455,27 @@ document
   // UTF-8 DECODE
   // --------------------------------------------------
 
-  const decoder =
-    new TextDecoder();
+  try {
 
-  const plaintext =
-    decoder.decode(
-      new Uint8Array(bytes)
-    );
+    const decoder =
+      new TextDecoder();
 
-  output.value =
-    plaintext;
+    const plaintext =
+      decoder.decode(
+        new Uint8Array(bytes)
+      );
+
+    output.value =
+      plaintext;
+
+  }
+
+  catch {
+
+    output.value =
+      "Gagal mendekripsi ciphertext.";
+
+  }
 
 });
 
