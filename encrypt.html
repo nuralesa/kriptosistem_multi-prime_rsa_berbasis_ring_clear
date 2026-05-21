@@ -162,14 +162,11 @@ function modPow(base, exp, mod) {
 
   let result = 1n;
 
-  let b =
-    BigInt(base);
+  let b = BigInt(base);
 
-  let e =
-    BigInt(exp);
+  let e = BigInt(exp);
 
-  let m =
-    BigInt(mod);
+  let m = BigInt(mod);
 
   while (e > 0n) {
 
@@ -205,8 +202,8 @@ function toHex(x) {
 // --------------------------------------------------
 
 document
-  .getElementById("encrypt-btn")
-  .addEventListener("click", () => {
+.getElementById("encrypt-btn")
+.addEventListener("click", () => {
 
   const plaintext =
     document
@@ -237,7 +234,7 @@ document
   }
 
   // --------------------------------------------------
-  // PARSING PUBLIC KEY
+  // PARSING KEY
   // --------------------------------------------------
 
   const match =
@@ -259,26 +256,80 @@ document
     parseInt(match[2]);
 
   // --------------------------------------------------
-  // KONVERSI PLAINTEXT KE ASCII
+  // UTF-8 SUPPORT
+  // SUPPORT SIMBOL
   // --------------------------------------------------
 
-  const asciiVals =
-    Array.from(plaintext)
-      .map(ch => ch.charCodeAt(0));
+  const encoder =
+    new TextEncoder();
 
-  // --------------------------------------------------
-  // RSA ENCRYPTION
-  // C = M^e mod n
-  // --------------------------------------------------
-
-  const C =
-    asciiVals.map(
-      m => modPow(m, e, n)
+  const bytes =
+    Array.from(
+      encoder.encode(plaintext)
     );
 
   // --------------------------------------------------
+  // REPRESENTASI RING CLEAR
+  // mi = ui + ri mod 256
+  // --------------------------------------------------
+
+  let u_list = [];
+  let r_list = [];
+
+  for (let m of bytes) {
+
+    let u;
+    let r;
+
+    // pilih unit
+    // gcd(u,256)=1
+
+    if (m % 2 === 1) {
+
+      u = m;
+      r = 0;
+
+    } else {
+
+      u = 1;
+      r = (m - 1 + 256) % 256;
+
+    }
+
+    u_list.push(u);
+    r_list.push(r);
+
+  }
+
+  // --------------------------------------------------
+  // RSA ENCRYPTION
+  // --------------------------------------------------
+
+  const Cu =
+    u_list.map(
+      u => modPow(u, e, n)
+    );
+
+  const Cr =
+    r_list.map(
+      r => modPow(r, e, n)
+    );
+
+  // --------------------------------------------------
+  // PEMBENTUKAN C
+  // --------------------------------------------------
+
+  const C = [];
+
+  for (let i = 0; i < Cu.length; i++) {
+
+    C.push(Cu[i]);
+    C.push(Cr[i]);
+
+  }
+
+  // --------------------------------------------------
   // PERMUTASI
-  // C' = π(C)
   // --------------------------------------------------
 
   let a = 5;
@@ -308,13 +359,13 @@ document
   }
 
   // --------------------------------------------------
-  // KONVERSI KE HEX
+  // HEX TANPA SPASI
   // --------------------------------------------------
 
   const cipherHex =
     C_perm
       .map(toHex)
-      .join(" ");
+      .join("");
 
   output.value =
     cipherHex;
