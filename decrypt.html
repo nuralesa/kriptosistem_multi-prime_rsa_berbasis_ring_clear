@@ -296,11 +296,11 @@ document
 
   }
 
-  const n =
-    parseInt(match[1]);
-
   const d =
-    parseInt(match[2]);
+  parseInt(match[1]);
+
+  const n =
+  parseInt(match[2]);
 
   // --------------------------------------------------
   // HEX -> INTEGER
@@ -367,10 +367,10 @@ document
   const Cu = [];
   const Cr = [];
 
-  for (let i = 0; i < cleanHex.length; i += 4) {
+  for (let i = 0; i < C.length; i += 2) {
 
-    Cu.push(C[i]);
-    Cr.push(C[i + 1]);
+  Cu.push(C[i]);
+  Cr.push(C[i + 1]);
 
   }
 
