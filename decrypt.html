@@ -279,14 +279,23 @@ document
     parseInt(match[2]);
 
   // --------------------------------------------------
-  // HEX -> INTEGER
-  // --------------------------------------------------
+// HEX -> INTEGER
+// --------------------------------------------------
 
-  const C_perm =
-    fromHexString(cipherHex);
+const C_perm =
+  fromHexString(cipherHex);
 
-  const length =
-    C_perm.length;
+const length =
+  C_perm.length;
+
+if (length === 0) {
+
+  output.value =
+    "Ciphertext kosong.";
+
+  return;
+
+}
 
   // --------------------------------------------------
   // INVERSE PERMUTATION
