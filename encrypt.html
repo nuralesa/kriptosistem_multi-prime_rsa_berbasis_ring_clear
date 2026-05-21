@@ -205,7 +205,7 @@ function modPow(base, exp, mod) {
 }
 
 // --------------------------------------------------
-// HEX FORMAT
+// FORMAT HEX DINAMIS
 // --------------------------------------------------
 
 function toHex(x) {
@@ -288,17 +288,8 @@ document
 
   }
 
-  if (n >= 65536) {
-
-    output.value =
-      "Nilai n harus kurang dari 65536.";
-
-    return;
-
-  }
-
   // --------------------------------------------------
-  // UTF-8 SUPPORT
+  // UTF-8 ENCODE
   // --------------------------------------------------
 
   const encoder =
@@ -310,54 +301,13 @@ document
     );
 
   // --------------------------------------------------
-  // REPRESENTASI BYTE REVERSIBLE
+  // RSA ENCRYPTION LANGSUNG
   // --------------------------------------------------
 
-  let u_list = [];
-
-  let r_list = [];
-
-  for (let m of bytes) {
-
-    const u =
-      Math.floor(m / 2);
-
-    const r =
-      m - u;
-
-    u_list.push(u);
-
-    r_list.push(r);
-
-  }
-
-  // --------------------------------------------------
-  // RSA ENCRYPTION
-  // --------------------------------------------------
-
-  const Cu =
-    u_list.map(
-      u => modPow(u, e, n)
+  const encrypted =
+    bytes.map(
+      b => modPow(b, e, n)
     );
-
-  const Cr =
-    r_list.map(
-      r => modPow(r, e, n)
-    );
-
-  // --------------------------------------------------
-  // PEMBENTUKAN C
-  // --------------------------------------------------
-
-  const C = [];
-
-  for (let i = 0; i < Cu.length; i++) {
-
-    C.push(Cu[i]);
-
-    C.push(Cr[i]);
-
-  }
 
   // --------------------------------------------------
   // PERMUTASI
@@ -366,7 +316,7 @@ document
   let a = 5;
 
   const length =
-    C.length;
+    encrypted.length;
 
   while (
     gcd(a, length) !== 1
@@ -376,7 +326,7 @@ document
 
   }
 
-  const C_perm =
+  const permuted =
     new Array(length);
 
   for (let i = 0; i < length; i++) {
@@ -384,8 +334,8 @@ document
     const j =
       (a * i) % length;
 
-    C_perm[j] =
-      C[i];
+    permuted[j] =
+      encrypted[i];
 
   }
 
@@ -394,7 +344,7 @@ document
   // --------------------------------------------------
 
   const cipherHex =
-    C_perm
+    permuted
       .map(toHex)
       .join("");
 
