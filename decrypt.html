@@ -31,7 +31,11 @@ tailwind.config = {
 <style>
 
 .material-symbols-outlined {
-  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24
 }
 
 body {
@@ -100,7 +104,7 @@ body {
 
     <input
       id="private-key"
-      placeholder="Contoh: (8671, 7003)"
+      placeholder="Contoh: (5431, 7429)"
       class="form-input w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800/50 h-14 px-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"/>
 
   </div>
@@ -147,7 +151,7 @@ body {
 <script>
 
 // --------------------------------------------------
-// FUNGSI BANTU
+// GCD
 // --------------------------------------------------
 
 function gcd(a, b) {
@@ -157,6 +161,10 @@ function gcd(a, b) {
     : gcd(b, a % b);
 
 }
+
+// --------------------------------------------------
+// MODULAR POWER
+// --------------------------------------------------
 
 function modPow(base, exp, mod) {
 
@@ -187,6 +195,10 @@ function modPow(base, exp, mod) {
   return Number(result);
 
 }
+
+// --------------------------------------------------
+// MODULAR INVERSE
+// --------------------------------------------------
 
 function modInverse(a, m) {
 
@@ -268,7 +280,9 @@ document
 
   }
 
-  // PARSING KEY
+  // --------------------------------------------------
+  // PARSING PRIVATE KEY
+  // --------------------------------------------------
 
   const match =
     keyInput.match(/\((\d+),\s*(\d+)\)/);
@@ -347,7 +361,7 @@ document
   }
 
   // --------------------------------------------------
-  // PISAH Cu DAN Cr
+  // PISAHKAN Cu DAN Cr
   // --------------------------------------------------
 
   const Cu = [];
@@ -366,17 +380,16 @@ document
 
   const u_list =
     Cu.map(
-      cu => modPow(cu, d, 256)
+      cu => modPow(cu, d, n)
     );
 
   const r_list =
     Cr.map(
-      cr => modPow(cr, d, 256)
+      cr => modPow(cr, d, n)
     );
 
   // --------------------------------------------------
   // REKONSTRUKSI
-  // mi = ui + ri mod 256
   // --------------------------------------------------
 
   const bytes = [];
@@ -392,7 +405,6 @@ document
 
   // --------------------------------------------------
   // UTF-8 DECODE
-  // SUPPORT SIMBOL
   // --------------------------------------------------
 
   const decoder =
