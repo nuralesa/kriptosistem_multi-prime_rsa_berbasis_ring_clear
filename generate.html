@@ -118,74 +118,294 @@ Kunci privat akan ditampilkan di sini setelah dibangkitkan.</textarea>
 </div>
 
 <script>
+
 // ----------------------------
-// Fungsi bantu (JS versi Pythonmu)
+// Fungsi bantu
 // ----------------------------
+
 function gcd(a, b) {
+
   while (b !== 0) {
+
     const temp = b;
+
     b = a % b;
+
     a = temp;
+
   }
+
   return a;
+
+}
+
+function isPrime(n) {
+
+  if (n < 2)
+    return false;
+
+  for (
+    let i = 2;
+    i <= Math.sqrt(n);
+    i++
+  ) {
+
+    if (n % i === 0)
+      return false;
+
+  }
+
+  return true;
+
 }
 
 function modinv(a, m) {
-  let t = 0, newT = 1;
-  let r = m, newR = a;
+
+  let t = 0;
+  let newT = 1;
+
+  let r = m;
+  let newR = a;
+
   while (newR !== 0) {
-    const q = Math.floor(r / newR);
-    [t, newT] = [newT, t - q * newT];
-    [r, newR] = [newR, r - q * newR];
+
+    const q =
+      Math.floor(r / newR);
+
+    [t, newT] = [
+      newT,
+      t - q * newT
+    ];
+
+    [r, newR] = [
+      newR,
+      r - q * newR
+    ];
+
   }
-  if (r > 1) throw new Error(`Tidak ada invers modular untuk ${a} mod ${m}`);
-  if (t < 0) t += m;
+
+  if (r > 1) {
+
+    throw new Error(
+      `Tidak ada invers modular untuk ${a} mod ${m}`
+    );
+
+  }
+
+  if (t < 0)
+    t += m;
+
   return t;
+
 }
 
 // ----------------------------
 // Proses utama
 // ----------------------------
-document.getElementById("generateKeyBtn").addEventListener("click", () => {
-  const p = parseInt(document.getElementById("prime1").value);
-  const q = parseInt(document.getElementById("prime2").value);
-  const r = parseInt(document.getElementById("prime3").value);
-  const e = parseInt(document.getElementById("e-value").value);
 
-  const pubKeyEl = document.getElementById("public-key");
-  const privKeyEl = document.getElementById("private-key");
+document
+.getElementById("generateKeyBtn")
+.addEventListener("click", () => {
+
+  const p =
+    parseInt(
+      document
+      .getElementById("prime1")
+      .value
+    );
+
+  const q =
+    parseInt(
+      document
+      .getElementById("prime2")
+      .value
+    );
+
+  const r =
+    parseInt(
+      document
+      .getElementById("prime3")
+      .value
+    );
+
+  const e =
+    parseInt(
+      document
+      .getElementById("e-value")
+      .value
+    );
+
+  const pubKeyEl =
+    document
+    .getElementById("public-key");
+
+  const privKeyEl =
+    document
+    .getElementById("private-key");
+
+  // ----------------------------
+  // VALIDASI INPUT
+  // ----------------------------
 
   if (!p || !q || !r || !e) {
-    alert("Mohon isi semua nilai bilangan prima dan e.");
+
+    alert(
+      "Mohon isi semua nilai bilangan prima dan e."
+    );
+
     return;
+
   }
 
-  const n = p * q * r;
-  const phi_n = (p - 1) * (q - 1) * (r - 1);
-  const g = gcd(e, phi_n);
+  // ----------------------------
+  // VALIDASI BILANGAN PRIMA
+  // ----------------------------
+
+  if (
+    !isPrime(p) ||
+    !isPrime(q) ||
+    !isPrime(r)
+  ) {
+
+    alert(
+      "p, q, dan r harus bilangan prima."
+    );
+
+    return;
+
+  }
+
+  // ----------------------------
+  // VALIDASI PRIMA BERBEDA
+  // ----------------------------
+
+  if (
+    p === q ||
+    q === r ||
+    p === r
+  ) {
+
+    alert(
+      "Bilangan prima harus berbeda."
+    );
+
+    return;
+
+  }
+
+  // ----------------------------
+  // HITUNG n
+  // ----------------------------
+
+  const n =
+    p * q * r;
+
+  // ----------------------------
+  // VALIDASI n
+  // ----------------------------
+
+  if (n <= 255) {
+
+    alert(
+      "Nilai n harus lebih besar dari 255."
+    );
+
+    return;
+
+  }
+
+  // karena ciphertext pakai hex 4 digit
+
+  if (n >= 65536) {
+
+    alert(
+      "Nilai n harus kurang dari 65536."
+    );
+
+    return;
+
+  }
+
+  // ----------------------------
+  // HITUNG φ(n)
+  // ----------------------------
+
+  const phi_n =
+    (p - 1) *
+    (q - 1) *
+    (r - 1);
+
+  // ----------------------------
+  // VALIDASI e
+  // ----------------------------
+
+  if (
+    e <= 1 ||
+    e >= phi_n
+  ) {
+
+    alert(
+      "Nilai e tidak valid."
+    );
+
+    return;
+
+  }
+
+  const g =
+    gcd(e, phi_n);
 
   if (g !== 1) {
-    pubKeyEl.value = `❌ Nilai e = ${e} tidak relatif prima terhadap φ(n) = ${phi_n}.
+
+    pubKeyEl.value =
+`❌ Nilai e = ${e} tidak relatif prima terhadap φ(n) = ${phi_n}.
 Karena gcd(e, φ(n)) = ${g}, silakan pilih e lain.`;
+
     privKeyEl.value = "";
+
     return;
+
   }
 
+  // ----------------------------
+  // HITUNG d
+  // ----------------------------
+
   try {
-    const d = modinv(e, phi_n);
-    pubKeyEl.value = `Kunci Publik (e, n):
+
+    const d =
+      modinv(e, phi_n);
+
+    // ----------------------------
+    // OUTPUT
+    // ----------------------------
+
+    pubKeyEl.value =
+`Kunci Publik (e, n):
 e = ${e}
 n = ${n}
 φ(n) = ${phi_n}`;
-    privKeyEl.value = `Kunci Privat (d, n):
+
+    privKeyEl.value =
+`Kunci Privat (d, n):
 d = ${d}
 n = ${n}
 Verifikasi: (e*d) mod φ(n) = ${(e * d) % phi_n}`;
-  } catch (err) {
-    pubKeyEl.value = "Terjadi kesalahan: " + err.message;
-    privKeyEl.value = "";
+
   }
+
+  catch (err) {
+
+    pubKeyEl.value =
+      "Terjadi kesalahan: " +
+      err.message;
+
+    privKeyEl.value = "";
+
+  }
+
 });
+
 </script>
 
 </body>
