@@ -223,7 +223,9 @@ document
     document
       .getElementById("ciphertext");
 
+  // --------------------------------------------------
   // VALIDASI
+  // --------------------------------------------------
 
   if (!plaintext || !keyInput) {
 
@@ -257,7 +259,7 @@ document
     parseInt(match[2]);
 
   // --------------------------------------------------
-  // KONVERSI ASCII
+  // KONVERSI PLAINTEXT KE ASCII
   // --------------------------------------------------
 
   const asciiVals =
@@ -265,97 +267,14 @@ document
       .map(ch => ch.charCodeAt(0));
 
   // --------------------------------------------------
-  // PEMBENTUKAN Z_256
-  // --------------------------------------------------
-
-  const Z =
-    Array.from(
-      {length: 256},
-      (_, i) => i
-    );
-
-  // --------------------------------------------------
-  // HIMPUNAN UNIT
-  // gcd(a,256)=1
-  // --------------------------------------------------
-
-  const units =
-    Z.filter(
-      a => gcd(a, 256) === 1
-    );
-
-  // --------------------------------------------------
-  // HIMPUNAN UNIT REGULAR
-  // --------------------------------------------------
-
-  function isUnitRegular(a) {
-
-    return Z.some(
-      x =>
-        (a * x * a) % 256 === a
-    );
-
-  }
-
-  const unitRegulars =
-    Z.filter(isUnitRegular);
-
-// --------------------------------------------------
-// REPRESENTASI
-// m = u + r mod 256
-// --------------------------------------------------
-
-let u_list = [];
-let r_list = [];
-
-for (let m of asciiVals) {
-
-  // pilih unit tetap
-  // 1 adalah unit di Z256
-
-  const u = 1;
-
-  // r = m - u mod 256
-
-  const r =
-    (m - u + 256) % 256;
-
-  u_list.push(u);
-
-  r_list.push(r);
-
-}
-
-  // --------------------------------------------------
   // RSA ENCRYPTION
-  // Cu = u^e mod n
-  // Cr = r^e mod n
+  // C = M^e mod n
   // --------------------------------------------------
 
-  const Cu =
-    u_list.map(
-      u => modPow(u, e, n)
+  const C =
+    asciiVals.map(
+      m => modPow(m, e, n)
     );
-
-  const Cr =
-    r_list.map(
-      r => modPow(r, e, n)
-    );
-
-  // --------------------------------------------------
-  // PEMBENTUKAN C
-  // C=(Cu1,Cr1,Cu2,Cr2,...)
-  // --------------------------------------------------
-
-  const C = [];
-
-  for (let i = 0; i < Cu.length; i++) {
-
-    C.push(Cu[i]);
-
-    C.push(Cr[i]);
-
-  }
 
   // --------------------------------------------------
   // PERMUTASI
@@ -389,7 +308,7 @@ for (let m of asciiVals) {
   }
 
   // --------------------------------------------------
-  // KONVERSI HEX
+  // KONVERSI KE HEX
   // --------------------------------------------------
 
   const cipherHex =
